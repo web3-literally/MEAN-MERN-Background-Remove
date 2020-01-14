@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Help & Contact') %></h1>
+        </header>
+        <!--<button class="btn btn-theme-dark mb-2" onclick="newMessage()"><h5 style="color: greenyellow"><i class="zwicon-mail"></i> New Message</h5></button>-->
+        <div class="card">
+            <div class="card-body">
+                <h5><%= i18n.__('MESSAGE SENT') %></h5>
+                <div class="table-responsive data-table">
+                    <table id="data-table" class="table table-bordered" style="text-align: center;">
+                        <thead>
+                        <tr>
+                            <th style="color: greenyellow;"><%= i18n.__('NO') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('DATE') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('TOPIC') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('CONTENT') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('IMAGE') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('STATUS') %></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% for(let i = 0; i < sent_messages.length; i++){ %>
+                            <tr>
+                                <td><%= i + 1 %></td>
+                                <td>
+                                    <%=sent_messages[i].date.getMonth()%>/<%=sent_messages[i].date.getDay()%>/<%=sent_messages[i].date.getFullYear()%>
+                                    <%=sent_messages[i].date.getHours()%>:<%=sent_messages[i].date.getMinutes()%>:<%=sent_messages[i].date.getSeconds()%>
+                                </td>
+                                <td><%= sent_messages[i].subject %></td>
+                                <td><%= sent_messages[i].content %></td>
+                                <td><img src="<%= sent_messages[i].image_url %>" style="width: 80px; height: 50px;"></td>
+                                <td>
+                                    <% if (sent_messages[i].type == "NORMAL"){ %>
+                                        <button class="btn btn-primary">Normal!</button>
+                                    <% } else if (sent_messages[i].type == "REQUEST") { %>
+                                        <button class="btn btn-success">Request!</button>
+                                    <% } else if (sent_messages[i].type == "BUG") { %>
+                                        <button class="btn btn-danger">Bug!</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="modal-new-message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: greenyellow">New Message</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Subject :</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <input type="text" id="message_subject" class="form-control" placeholder="ENTER THE SUBJECT">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group text-center p-2" style="border:solid 1px gray">
+                    <input type="file" id="upload_input" style="display: none;" accept="image/*" onchange="selectBackgroundFromFile(event)">
+                    <img src="" id="user-background" style="width:100%;" onclick="$('#upload_input').click();" alt='Please Click Here To Select Your Image!'>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="message_content" style="height: 200px" type="text" placeholder="<%= i18n.__('MESSAGE CONTENT') %>"></textarea>
+                </div>
+                <div class="form-group row px-3">
+                    <div class="custom-control custom-radio col-4">
+                        <input type="radio" id="normal-radio" name="MessageStyle" class="custom-control-input" value="NORMAL" checked>
+                        <label class="custom-control-label" for="normal-radio">Normal</label>
+                    </div>
+                    <div class="custom-control custom-radio col-4">
+                        <input type="radio" id="request-radio" name="MessageStyle" class="custom-control-input" value="REQUEST">
+                        <label class="custom-control-label" for="request-radio">Reguest</label>
+                    </div>
+                    <div class="custom-control custom-radio col-4">
+                        <input type="radio" id="bugreport-radio" name="MessageStyle" class="custom-control-input" value="BUG">
+                        <label class="custom-control-label" for="bugreport-radio">Bug</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link" onclick="SendMessage()"><%= i18n.__('Send') %></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    function newMessage() {
+        $('#modal-new-message').modal();
+    }
+
+    function selectBackgroundFromFile(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                $('#user-background').attr('src', event.target.result);
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+
+    function SendMessage() {
+        let message_subject = $('#message_subject').val();
+        let message_content = $('#message_content').val();
+        let user_background = $('#user-background').attr('src');
+        let message_type = $("input[name='MessageStyle']:checked").val();
+        $.ajax({
+            url: '/send-message',
+            method: 'post',
+            data: {
+                message_subject: message_subject,
+                message_content: message_content,
+                user_background: user_background,
+                message_type: message_type,
+                date: new Date(),
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-new-message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/help/sent';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<aside class="sidebar ">
+    <div class="scrollbar">
+        <div class="user">
+            <div class="user__info">
+                <img class="user__img" src="<%= user.avatar %>" alt="MotorCut Logo">
+                <div style="word-break: break-all">
+                    <div class="user__name"><%= user.username %></div>
+                    <div class="user__email"><%= user.email %></div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="navigation">
+            <% if(session.user.role == 0 || session.user.role == 1) { %>
+                <li class="<%= (tab_text == 'admin_dashboard')?'navigation__active':'' %>">
+                    <a href="/admin/dashboard"><i class="zwicon-home"></i> <%= i18n.__('Dashboard') %></a>
+                </li>
+
+                <li class="<%= (tab_text == 'admin_setting')?'navigation__active':'' %>">
+                    <a href="/admin/setting"><i class="zwicon-cog"></i> <%= i18n.__('Background Setting') %></a>
+                </li>
+
+                <li class="<%= (tab_text == 'admin_activity')?'navigation__active':'' %>">
+                    <a href="/admin/activity"><i class="zwicon-image"></i> <%= i18n.__('Activity Center') %></a>
+                </li>
+
+                <li class="navigation__sub <%= (tab_text === 'message_center')?'navigation__sub--active':'' %>">
+                    <a href="javascript:"><i class="zwicon-mail"></i> <%= i18n.__('Message Center') %></a>
+                    <ul>
+                        <li class="<%= (sub_text == 'admin_new_message')?'navigation__active':'' %>">
+                            <a href="/admin/message-center/new-message"><i class="zwicon-mail"></i> <%= i18n.__('New Message') %></a>
+                        </li>
+
+                        <li class="<%= (sub_text == 'inbox_message')?'navigation__active':'' %>">
+                            <a href="/admin/message-center/inbox"><i class="zwicon-cast"></i> <%= i18n.__('Inbox') %></a>
+                        </li>
+
+                        <li class="<%= (sub_text == 'sent_message')?'navigation__active':'' %>">
+                            <a href="/admin/message-center/sent"><i class="zwicon-send"></i> <%= i18n.__('Sent') %></a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="<%= (tab_text == 'admin_client_management')?'navigation__active':'' %>">
+                    <a href="/admin/client-management"><i class="zwicon-stand-up"></i> <%= i18n.__('Client Management') %></a>
+                </li>
+            <% }%>
+
+            <% if(session.user.role == 0 || session.user.role == 2) { %>
+                <li class="<%= (tab_text == 'user_dashboard')?'navigation__active':'' %>">
+                    <a href="/dashboard"><i class="zwicon-home"></i> <%= i18n.__('Dashboard') %></a>
+                </li>
+
+                <li class="<%= (tab_text == 'recent_activities')?'navigation__active':'' %>">
+                    <a href="/recent_activities"><i class="zwicon-history"></i> <%= i18n.__('Recent Activities') %></a>
+                </li>
+
+                <li class="<%= (tab_text == 'user_tutorial')?'navigation__active':'' %>">
+                    <a href="/tutorial"><i class="zwicon-comment"></i> <%= i18n.__('Tutorial') %></a>
+                </li>
+
+                <li class="navigation__sub <%= (tab_text === 'user_help')?'navigation__sub--active':'' %>">
+                    <a href="javascript:"><i class="zwicon-mail"></i> <%= i18n.__('Help & Contact Support') %></a>
+                    <ul>
+                        <li class="<%= (sub_text == 'user_new_message')?'navigation__active':'' %>">
+                            <a href="/help/new-message"><i class="zwicon-mail"></i> <%= i18n.__('New Message') %></a>
+                        </li>
+
+                        <li class="<%= (sub_text == 'inbox_message')?'navigation__active':'' %>">
+                            <a href="/help/inbox"><i class="zwicon-cast"></i> <%= i18n.__('Inbox') %></a>
+                        </li>
+
+                        <li class="<%= (sub_text == 'sent_message')?'navigation__active':'' %>">
+                            <a href="/help/sent"><i class="zwicon-send"></i> <%= i18n.__('Sent') %></a>
+                        </li>
+                    </ul>
+                </li>
+            <% }%>
+
+            <li class="<%= (tab_text === 'image_process')?'navigation__active':'' %>">
+                <a href="/image-process"><i class="zwicon-image-circle"></i> <%= i18n.__('Image Process') %></a>
+            </li>
+
+            <li class="<%= (tab_text == 'user_back_remove')?'navigation__active':'' %>">
+                <a href="/background-remove"><i class="zwicon-edit-square-feather"></i> <%= i18n.__('Select Background') %></a>
+            </li>
+
+            <li class="<%= (tab_text === 'settings')?'navigation__active':'' %>">
+                <a href="/admin/account-settings"><i class="zwicon-cog"></i> <%= i18n.__('Account Settings') %></a>
+            </li>
+
+            <li>
+                <a href="/auth/logout"><i class="zwicon-arrow-circle-right"></i> <%= i18n.__('Logout') %></a>
+            </li>
+        </ul>
+    </div>
+</aside>

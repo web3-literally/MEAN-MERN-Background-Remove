@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Dashboard') %></h1>
+        </header>
+
+        <div class="row price-table price-table--highlight">
+            <div class="col-md-4">
+                <div class="price-table__item">
+                    <header class="price-table__header">
+                        <!--<div class="quick-stats__chart peity-bar">6,4,8,6,5,6,7,8,3,5,9</div>-->
+                        <div class="price-table__title"><h3>Total Credits</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        500 Credits |
+                        <small>month</small>
+                    </div>
+                    <ul class="price-table__info">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="price-table__item price-table__item--popular">
+                    <header class="price-table__header">
+                        <!--<div class="quick-stats__chart peity-bar">4,7,6,2,5,3,8,6,6,4,8</div>-->
+                        <div class="price-table__title"><h3>Accounts</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        <%=users.length%> Accounts |
+                        <small>so far</small>
+                    </div>
+                    <ul class="price-table__info">
+                    </ul>
+                    <a href="/admin/client-management" class="price-table__action">View Accounts</a>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="price-table__item">
+                    <header class="price-table__header">
+                        <!--<div class="quick-stats__chart peity-bar">9,4,6,5,6,4,5,7,9,3,6</div>-->
+                        <div class="price-table__title"><h3>Users Credits</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        <%=users_credits%> Credits |
+                        <small>total</small>
+                    </div>
+                    <ul class="price-table__info">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="text-center">
+            <header class="content__title">
+                <h1><%= i18n.__('The Highest Activity Members') %></h1>
+            </header>
+        </div>
+        <div class="row team">
+            <% for (let i = 0; i < highest_members.length; i++) {%>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card team__item">
+                        <img src="<%=highest_members[i].avatar%>" class="team__img" alt="">
+
+                        <div class="card-body">
+                            <h4 class="card-title"><%=highest_members[i].username%></h4>
+                            <h6 class="card-subtitle" style="color: greenyellow;"><%=highest_members[i].processed_count%> Images Processed</h6>
+                            <a href="/admin/message-center/new-message" class="btn btn-theme">Contact</a>
+                        </div>
+                    </div>
+                </div>
+            <%}%>
+        </div>
+
+        <hr>
+        <div class="text-center">
+            <header class="content__title">
+                <h1><%= i18n.__('The Lowest Activity Members') %></h1>
+            </header>
+        </div>
+        <div class="row team">
+            <% for (let i = 0; i < lowest_members.length; i++) {%>
+            <div class="col-md-6 col-lg-4">
+                <div class="card team__item">
+                    <img src="<%=lowest_members[i].avatar%>" class="team__img" alt="">
+
+                    <div class="card-body">
+                        <h4 class="card-title"><%=lowest_members[i].username%></h4>
+                        <h6 class="card-subtitle" style="color: greenyellow;"><%=lowest_members[i].processed_count%> Images Processed</h6>
+                        <a href="/admin/message-center/new-message" class="btn btn-theme">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <%}%>
+        </div>
+        <!--<div class="card">-->
+            <!--<div class="toolbar toolbar&#45;&#45;inner">-->
+                <!--<div class="toolbar__nav">-->
+                    <!--<a class="active" href="">Opened 25</a>-->
+                    <!--<a href="" class="hidden-sm-down">Responded 30</a>-->
+                    <!--<a href="">Closed 19</a>-->
+                <!--</div>-->
+
+                <!--<div class="actions">-->
+                    <!--<i class="actions__item zwicon-search" data-sa-action="toolbar-search-open" data-toggle="tooltip" data-title="Search"></i>-->
+
+                    <!--<div class="dropdown actions__item d-none d-md-flex" data-toggle="tooltip" data-title="Tag">-->
+                        <!--<i class="zwicon-price-tag" data-toggle="dropdown"></i>-->
+
+                        <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active">-->
+                            <!--<a class="dropdown-item" href="">All</a>-->
+                            <!--<a class="dropdown-item" href="">Tag One</a>-->
+                            <!--<a class="dropdown-item" href="">Tag Two</a>-->
+                            <!--<a class="dropdown-item" href="">Tag Three</a>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="dropdown actions__item d-none d-md-flex" data-toggle="tooltip" data-title="Severity">-->
+                        <!--<i class="zwicon-info-circle" data-toggle="dropdown"></i>-->
+
+                        <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active">-->
+                            <!--<a class="dropdown-item" href="">All</a>-->
+                            <!--<a class="dropdown-item" href="">Severe</a>-->
+                            <!--<a class="dropdown-item" href="">High</a>-->
+                            <!--<a class="dropdown-item" href="">Medium</a>-->
+                            <!--<a class="dropdown-item" href="">Low</a>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="dropdown actions__item d-none d-md-flex" data-toggle="tooltip" data-title="Project">-->
+                        <!--<i class="zwicon-notebook" data-toggle="dropdown"></i>-->
+
+                        <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active">-->
+                            <!--<a class="dropdown-item" href="">All Projects</a>-->
+                            <!--<a class="dropdown-item" href="">Project One</a>-->
+                            <!--<a class="dropdown-item" href="">Project Two</a>-->
+                            <!--<a class="dropdown-item" href="">Project Three</a>-->
+                            <!--<a class="dropdown-item" href="">Project Four</a>-->
+                            <!--<a class="dropdown-item" href="">Project Five</a>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="dropdown actions__item d-none d-md-flex" data-toggle="tooltip" data-title="Assignee">-->
+                        <!--<i class="zwicon-user-circle" data-toggle="dropdown"></i>-->
+
+                        <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active">-->
+                            <!--<a class="dropdown-item" href="">Everyone</a>-->
+                            <!--<a class="dropdown-item" href="">David Wilson</a>-->
+                            <!--<a class="dropdown-item" href="">James Frank</a>-->
+                            <!--<a class="dropdown-item" href="">Natalie Sheth</a>-->
+                            <!--<a class="dropdown-item" href="">Christian Robu</a>-->
+                            <!--<a class="dropdown-item" href="">Wins Williamson</a>-->
+                        <!--</div>-->
+                    <!--</div>-->
+
+                    <!--<div class="dropdown actions__item d-none d-md-flex" data-toggle="tooltip" data-title="Sort by">-->
+                        <!--<i class="zwicon-filter-alt" data-toggle="dropdown"></i>-->
+
+                        <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active">-->
+                            <!--<a class="dropdown-item" href="">Newest</a>-->
+                            <!--<a class="dropdown-item" href="">Oldest</a>-->
+                            <!--<a class="dropdown-item" href="">Most Commented</a>-->
+                            <!--<a class="dropdown-item" href="">Least Commented</a>-->
+                            <!--<a class="dropdown-item" href="">Recently Updated</a>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="toolbar__search">-->
+                    <!--<input type="text" placeholder="Search for issues...">-->
+                    <!--<i class="toolbar__search__close zwicon-arrow-left" data-sa-action="toolbar-search-close"></i>-->
+                <!--</div>-->
+            <!--</div>-->
+
+            <!--<div class="listview listview&#45;&#45;bordered issue-tracker">-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="/avatars/avatar.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate text-truncate">-->
+                        <!--<a class="listview__heading" href="">Ed porta ut justo vitae volutpat. Aliquam varius tortor non egestas blandit. Fusce in sem lectus</a>-->
+                        <!--<p>#148 Opened 2 Days ago by Louie Holmes</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-red">Issue</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>17/11/2017 at 12:33-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>04-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="/avatars/avatar.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Dulla vel metus scelerisque ante sollicitudin commodo purus odio</a>-->
+                        <!--<p>#132 Opened Yesterday by Joseph Hamilton</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-blue">Suggestion</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>19/11/2017 at 09:01-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>23-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<i class="avatar-char">K</i>-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Nunc dictum tortor nec orci tempor vehicula. Curabitur bibendum non dolor vel hendrerit.</a>-->
+                        <!--<p>#130 Opened on 10/11/2017 by Kason Sawyer</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-green">Optimization</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>10/11/2017 at 15:13-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>01-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<i class="avatar-char">T</i>-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos</a>-->
+                        <!--<p>#129 Opened on 05/11/2017 by Theodore Cotton</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-red">Issue</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>05/11/2017 at 19:00-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>04-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="/avatars/avatar.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Suspendisse aliquet dapibus ornare.</a>-->
+                        <!--<p>#128 Opened on 22/10/2017 Days ago by Gary Schneider</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-red">Issue</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>22/10/2017 at 01:54-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>00-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<i class="avatar-char">J</i>-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos</a>-->
+                        <!--<p>#125 Opened on 12/09/2017 by Jonathan Kelly</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-orange">Discussion</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>12/09/2017 at 22:59-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>18-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="demo/img/contacts/5.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Maecenas accumsan risus et enim tincidunt</a>-->
+                        <!--<p>#124 Opened on 12/09/2017 by Samuel Doyle</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-green">Optimization</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>12/09/2017 at 02:50-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>02-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="/avatars/avatar.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Morbi sit amet nunc a nunc venenatis sagittis vitae lacinia dolor</a>-->
+                        <!--<p>#120 Opened on 30/08/2017 by Isaac Francis</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-cyan">Version 2.0</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>30/08/2017 at 01:32-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>10-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<img src="/avatars/avatar.jpg" class="avatar-img" alt="">-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed volutpat quis metus non placerat. Aenean vestibulum, dolor nec tempus consectetur</a>-->
+                        <!--<p>#118 Opened on 10/07/2017 by Anders Gould</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-orange">Discussion</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>10/07/2017 at 01:11-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>10-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="listview__item">-->
+                    <!--<i class="avatar-char">L</i>-->
+
+                    <!--<div class="listview__content text-truncate">-->
+                        <!--<a class="listview__heading" href="">Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos</a>-->
+                        <!--<p>#100 Opened on 01/07/2017 by Leo Macdonald</p>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<span class="badge bg-indigo">Future</span>-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-lg-inline">-->
+                        <!--<i class="zwicon-clock"></i>10/07/2017 at 01:11-->
+                    <!--</div>-->
+
+                    <!--<div class="issue-tracker__item d-none d-sm-inline">-->
+                        <!--<i class="zwicon-comment"></i>10-->
+                    <!--</div>-->
+
+                    <!--<div class="actions listview__actions">-->
+                        <!--<div class="dropdown actions__item">-->
+                            <!--<i class="zwicon-more-h" data-toggle="dropdown"></i>-->
+
+                            <!--<div class="dropdown-menu dropdown-menu-right dropdown-menu&#45;&#45;active dropdown-menu&#45;&#45;icon">-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-checkmark-circle"></i>Respond</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-close"></i>Close</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-edit-pencil"></i>Edit</a>-->
+                                <!--<a href="" class="dropdown-item"><i class="zwicon-trash"></i>Delete</a>-->
+                            <!--</div>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+
+                <!--<div class="clearfix m-4"></div>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <!--<nav>-->
+            <!--<ul class="pagination justify-content-center">-->
+                <!--<li class="page-item pagination-prev"><a class="page-link" href="#"><i class="zwicon-arrow-left"></i></a></li>-->
+                <!--<li class="page-item active"><a class="page-link" href="#">1</a></li>-->
+                <!--<li class="page-item"><a class="page-link" href="#">2</a></li>-->
+                <!--<li class="page-item"><a class="page-link" href="#">3</a></li>-->
+                <!--<li class="page-item"><a class="page-link" href="#">4</a></li>-->
+                <!--<li class="page-item"><a class="page-link" href="#">5</a></li>-->
+                <!--<li class="page-item"><a class="page-link" href="#">6</a></li>-->
+                <!--<li class="page-item pagination-next"><a class="page-link" href="#"><i class="zwicon-arrow-right"></i></a></li>-->
+            <!--</ul>-->
+        <!--</nav>-->
+    </div>
+</section>
+
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+
+</body>
+</html>

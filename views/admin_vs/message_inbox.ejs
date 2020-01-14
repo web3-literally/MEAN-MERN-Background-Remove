@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Help & Contact') %></h1>
+        </header>
+        <!--<button class="btn btn-theme-dark mb-2" onclick="newMessage()"><h5 style="color: greenyellow"><i class="zwicon-mail"></i> New Message</h5></button>-->
+        <div class="card">
+            <div class="card-body">
+                <h5><%= i18n.__('MESSAGE INBOX') %></h5>
+                <div class="table-responsive data-table">
+                    <table id="data-table" class="table table-bordered" style="text-align: center;">
+                        <thead>
+                        <tr>
+                            <th style="color: greenyellow;"><%= i18n.__('NO') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('DATE') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('PHOTO') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('USER') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('EMAIL') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('TOPIC') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('CONTENT') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('IMAGE') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('STATUS') %></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <%for (let i = 0; i < inbox_messages.length; i++){%>
+                            <tr>
+                                <td><%=i+1%></td>
+                                <td>
+                                    <%=inbox_messages[i].date.getMonth()%>/<%=inbox_messages[i].date.getDay()%>/<%=inbox_messages[i].date.getFullYear()%>
+                                    <%=inbox_messages[i].date.getHours()%>:<%=inbox_messages[i].date.getMinutes()%>:<%=inbox_messages[i].date.getSeconds()%>
+                                </td>
+                                <td><img style="width: 60px;" src="<%=users.find(x => x.id == inbox_messages[i].user_id).avatar%>"></td>
+                                <td><%=users.find(x => x.id == inbox_messages[i].user_id).username%></td>
+                                <td><%=users.find(x => x.id == inbox_messages[i].user_id).email%></td>
+                                <td><%=inbox_messages[i].subject%></td>
+                                <td><%=inbox_messages[i].content%></td>
+                                <td><img src="<%=inbox_messages[i].image_url%>" style="width: 80px;"></td>
+                                <td>
+                                    <% if (inbox_messages[i].type == "NORMAL"){ %>
+                                        <button class="btn btn-primary">Normal!</button>
+                                    <% } else if (inbox_messages[i].type == "REQUEST" && inbox_messages[i].status == "NEW") { %>
+                                        <button class="btn btn-success" onclick="acceptRequest('<%=inbox_messages[i].id%>')">Request!</button>
+                                    <% } else if (inbox_messages[i].type == "REQUEST" && inbox_messages[i].status != "NEW") { %>
+                                            <button class="btn btn-warning" disabled>Request! (Accepted)</button>
+                                    <% } else if (inbox_messages[i].type == "BUG") { %>
+                                        <button class="btn btn-danger">Bug!</button>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="modal-new-message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: greenyellow">New Message</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-sm-3 col-form-label">To (Email) :</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <input type="email" id='user_email' class="form-control" placeholder="ENTER THE CLIENT EMAIL">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Subject :</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <input type="text" id='message_subject' class="form-control" placeholder="ENTER THE SUBJECT">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="message_content" style="height: 200px" type="text" placeholder="<%= i18n.__('MESSAGE CONTENT') %>"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link" onclick="SendMessage()"><%= i18n.__('Send') %></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- accept modal -->
+<div class="modal fade" id="modal_accept_message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body text-center">
+                <div class="form-group">
+                    <i class="zwicon-info-circle" style="font-size: 7rem"></i>
+                </div>
+                <div class="form-group">
+                    <h3><%= i18n.__('Are you sure to accept this custom background?') %></h3>
+                </div>
+                <input type="hidden" id="modal_delete_type">
+                <input type="hidden" id="modal_accept_id">
+                <button type="button" class="btn btn-link" onclick="submitAccept()"><%= i18n.__('Accept')%></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal"><%= i18n.__('Cancel') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    function newMessage() {
+        $('#modal-new-message').modal();
+    }
+
+    function SendMessage() {
+        let user_email = $('#user_email').val();
+        let message_subject = $('#message_subject').val();
+        let message_content = $('#message_content').val();
+
+        $.ajax({
+            url: '/admin/send-message',
+            method: 'post',
+            data: {
+                user_email: user_email,
+                message_subject: message_subject,
+                message_content: message_content,
+                date: new Date(),
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-new-message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/admin/message-center/sent';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+    function acceptRequest(id) {
+        $('#modal_accept_id').val(id);
+        $('#modal_accept_message').modal();
+    }
+
+    function submitAccept() {
+        let message_id = $('#modal_accept_id').val();
+        $.ajax({
+            url: '/admin/accept-custom-background',
+            method: 'post',
+            data: {
+                message_id: message_id,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal_accept_message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/admin/setting';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

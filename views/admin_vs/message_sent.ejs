@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Help & Contact') %></h1>
+        </header>
+        <!--<button class="btn btn-theme-dark mb-2" onclick="newMessage()"><h5 style="color: greenyellow"><i class="zwicon-mail"></i> New Message</h5></button>-->
+        <div class="card">
+            <div class="card-body">
+                <h5><%= i18n.__('MESSAGE SENT') %></h5>
+                <div class="table-responsive data-table">
+                    <table id="data-table" class="table table-bordered" style="text-align: center;">
+                        <thead>
+                        <tr>
+                            <th style="color: greenyellow;"><%= i18n.__('NO') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('DATE') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('PHOTO') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('USER') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('EMAIL') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('TOPIC') %></th>
+                            <th style="color: greenyellow;"><%= i18n.__('CONTENT') %></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <%for (let i = 0; i < sent_messages.length; i++){%>
+                        <tr>
+                            <td><%=i+1%></td>
+                            <td>
+                                <%=sent_messages[i].date.getMonth()%>/<%=sent_messages[i].date.getDay()%>/<%=sent_messages[i].date.getFullYear()%>
+                                <%=sent_messages[i].date.getHours()%>:<%=sent_messages[i].date.getMinutes()%>:<%=sent_messages[i].date.getSeconds()%>
+                            </td>
+                            <td><img style="width: 60px;" src="<%=users.find(x => x.id == sent_messages[i].user_id).avatar%>"></td>
+                            <td><%=users.find(x => x.id == sent_messages[i].user_id).username%></td>
+                            <td><%=users.find(x => x.id == sent_messages[i].user_id).email%></td>
+                            <td><%=sent_messages[i].subject%></td>
+                            <td><%=sent_messages[i].content%></td>
+                        </tr>
+                        <%}%>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div class="modal fade" id="modal-new-message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: greenyellow">New Message</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <label class="col-sm-3 col-form-label">To (Email) :</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <input type="email" id='user_email' class="form-control" placeholder="ENTER THE CLIENT EMAIL">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label">Subject :</label>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <input type="text" id='message_subject' class="form-control" placeholder="ENTER THE SUBJECT">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="message_content" style="height: 200px" type="text" placeholder="<%= i18n.__('MESSAGE CONTENT') %>"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-link" onclick="SendMessage()"><%= i18n.__('Send') %></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    function newMessage() {
+        $('#modal-new-message').modal();
+    }
+
+    function SendMessage() {
+        let user_email = $('#user_email').val();
+        let message_subject = $('#message_subject').val();
+        let message_content = $('#message_content').val();
+
+        $.ajax({
+            url: '/admin/send-message',
+            method: 'post',
+            data: {
+                user_email: user_email,
+                message_subject: message_subject,
+                message_content: message_content,
+                date: new Date(),
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-new-message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/admin/message-center/sent';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

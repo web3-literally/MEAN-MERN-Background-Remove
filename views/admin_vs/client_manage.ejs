@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<style>
+    #groups-table th, #groups-table td {
+        text-align: center;
+    }
+
+    input[name="groupRadio"] {
+        position: relative;
+    }
+</style>
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Client Management') %></h1>
+        </header>
+        <div class="card">
+            <div class="card-body">
+                <h5><%= i18n.__('CLIENTS LIST') %></h5>
+                <div class="py-3 text-right">
+                    <button type="button" class="btn btn-success" onclick="addUser()">Add New Client</button>
+                </div>
+                <div class="table-responsive data-table">
+                    <table id="users-table" class="table table-bordered text-center">
+                        <thead>
+                        <tr>
+                            <th style="color: yellow;">NO</th>
+                            <th style="color: yellow;">PHOTO</th>
+                            <th style="color: yellow;min-width: 160px;">USER</th>
+                            <th style="color: yellow;min-width: 160px;">EMAIL</th>
+                            <!--<th style="color: yellow;">PHONE</th>-->
+                            <th style="color: yellow;">APROVE</th>
+                            <th style="color: yellow;">MONTH CREDIT</th>
+                            <th style="color: yellow;">REMAIN CREDIT</th>
+                            <th style="color: yellow; width: 8%;">ACTIVE</th>
+                            <th style="color: yellow; width: 8%;">BLOCK</th>
+                            <th style="color: yellow; width: 8%;">EDIT</th>
+                            <th style="color: yellow; width: 8%;">REMOVE</th>
+                            <th style="color: yellow; width: 10%;">BACKGROUND</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% for (let k = 0; k < users.length; k++) { %>
+                            <% if (users[k].aprove_status == "ACTIVE") { %>
+                            <tr id="<%= users[k].id %>" style="background: rgba(0,255,0,0.2);">
+                                <% } else { %>
+                            <tr id="<%= users[k].id %>" style="background: rgba(0,0,0,0.2);">
+                                <% } %>
+                                <td class="user-number"><%= k + 1 %></td>
+                                <td class="user-number"><img src="<%=users[k].avatar%>" style="width: 60px;"></td>
+                                <td class="user-name"><%= users[k].username %></td>
+                                <td class="user-email"><%= users[k].email %></td>
+                                <td class="user-aprove"><%= users[k].aprove_status %></td>
+                                <td class="user-monthly-token"><%= users[k].monthly_token %></td>
+                                <td class="user-monthly-token"><%= users[k].remain_token %></td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-success py-1" onclick="activeUser('<%= users[k].id %>')">ACTIVE</button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-danger py-1" onclick="blockUser('<%= users[k].id %>')">BLOCK</button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-outline-primary py-1" onclick="editUser('<%= users[k].id %>')">EDIT</button>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger py-1" onclick="removeUser('<%= users[k].id %>')">REMOVE</button>
+                                </td>
+                                <td>
+                                    <a class="btn btn-outline-warning py-1" data-toggle="collapse" href="#collapseExample" onclick='chooseBackground("<%= users[k].id %>")'>BACKGROUND</a>
+                                </td>
+                            </tr>
+                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="accordion" id="accordionExample">
+                    <div class="collapse text-center" id="collapseExample" data-parent="#accordionExample">
+                        <hr>
+                        <input type="hidden" id = 'selected-userid'>
+                        <div class="card card-body w-100" style="display: inline-block;">
+                            <label class="card-title" style="font-size: 20px; color: red;">Current User Backgrounds</label>
+                            <hr>
+                            <div class="row">
+                                <div class="col-md-4 col-2"></div>
+                                <div class="col-md-4 col-8 m-0 p-1">
+                                    <img src="<%= user.background_url %>" id='user-background' alt="" width="100%"/>
+                                    <div class="form-group mt-3">
+                                        <input type="file" id="upload_input" style="display: none;" accept="image/*" onchange="selectBackgroundFromFile(event)">
+                                        <button class="btn btn-success mr-3" onclick="$('#upload_input').click();">Select Background</button>
+                                        <button class="btn btn-warning" id='btn-upload-user-bg' disabled onclick="uploadUserBackgroundToServer()">Upload Background</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-2"></div>
+                            </div>
+                            <hr>
+                            <label class="card-title" style="font-size: 20px; color: yellow;">System Backgrounds</label>
+                            <hr>
+                            <div class="row">
+                                <% for (let i = 0; i < backgrounds.length; i++){ %>
+                                    <div class="col-md-2 col-4 m-0 p-1">
+                                        <div class="row p-1 m-0" style="border: 1px solid gray;">
+                                            <label class="pt-1 ml-3" style="font-size: 15px;color: greenyellow;">Current Users: <%=backgrounds[i].user_list.length%></label>
+                                        </div>
+                                        <img src="<%= backgrounds[i].url %>" id="<%= backgrounds[i].id %>" alt="" width="100%" onmouseenter="mouseonBackground(this)" onclick="selectBackground(this)"/>
+                                    </div>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- change group of user -->
+<div class="modal fade" id="modal-user" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change group of user</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modal_user_id" value="">
+                <div class="form-group text-center p-2" style="border:solid 1px gray">
+                    <input type="file" id="avatar_upload_input" style="display: none;" accept="image/*" onchange="selectAvatarFromFile(event)">
+                    <img src="" id="user-avatar" style="width:100%;" onclick="$('#avatar_upload_input').click();" alt='Please Click Here To Select Your Image!'>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">User Name : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="user_name" placeholder="User Name" required/>
+                            <div class="invalid-feedback">Please provide a valid input</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">Email : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="email" class="form-control" id="email" placeholder="Email" required/>
+                            <div class="invalid-feedback">Please provide a valid input</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">Phone Number : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="phone_number" placeholder="Phone Number"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">Monthly Token : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="number" class="form-control" id="monthly_token" placeholder="Monthly Token" required/>
+                            <div class="invalid-feedback">Please provide a valid input</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4 enable_change_password">
+                    <div class="col-sm-6">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" onchange="enableChangePassword()" id="enable_change_password" checked>
+                            <label class="custom-control-label" for="enable_change_password">Enable Change Password</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">Password : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password" placeholder="Password" required/>
+                            <div class="invalid-feedback">Please provide a valid input</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-6 col-form-label">Confirm Password : </label>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password" required/>
+                            <div class="invalid-feedback">Please provide a valid input</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" onclick="submitChangeUser()">Save Changes</button>
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- remove modal -->
+<div class="modal fade" id="modal_delete_message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <i class="zwicon-info-circle" style="font-size: 7rem"></i>
+                </div>
+                <div class="form-group">
+                    <h3><%= i18n.__('Are you sure to remove?') %></h3>
+                </div>
+                <input type="hidden" id="modal_delete_type">
+                <input type="hidden" id="modal_delete_id">
+                <button type="button" class="btn btn-link" onclick="onDeleteBtn()"><%= i18n.__('Remove')%></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal"><%= i18n.__('Cancel') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    $(document).ready(function () {
+        $("#users-table").DataTable({
+            aaSorting: [],
+            autoWidth: !1,
+            responsive: !0,
+            lengthMenu: [[15, 40, 100, -1], ["15 Rows", "40 Rows", "100 Rows", "Everything"]],
+            language: {searchPlaceholder: "Search for records..."},
+            sDom: '<"dataTables__top"flB<"dataTables_actions">>rt<"dataTables__bottom"ip><"clear">',
+            buttons: [{extend: "excelHtml5", title: "Export Data"}, {extend: "csvHtml5", title: "Export Data"}, {extend: "print", title: "Material Admin"}],
+            initComplete: function () {
+                let html = '<i class="zwicon-more-h" data-toggle="dropdown"></i>' +
+                    '<div class="dropdown-menu dropdown-menu-right">' +
+                    // '<a data-table-action="print" class="dropdown-item">Print</a>' +
+                    '<a data-table-action="fullscreen" class="dropdown-item">Fullscreen</a>' +
+                    // '<a data-table-action="excel" class="dropdown-item">Excel (.xlsx)</a>' +
+                    // '<a data-table-action="csv" class="dropdown-item">CSV (.csv)</a>' +
+                    '</div>';
+                $(".dataTables_actions").html(html)
+            }
+        });
+        $("body").on("click", "[data-table-action]", function (e) {
+            e.preventDefault();
+            let t = $(this).data("table-action");
+            if ("excel" === t && $("#users-table_wrapper").find(".buttons-excel").click(), "csv" === t && $("#users-table_wrapper").find(".buttons-csv").click(), "print" === t && $("#users-table_wrapper").find(".buttons-print").click(), "fullscreen" === t) {
+                let a = $(this).closest(".card");
+                a.hasClass("card--fullscreen") ? (a.removeClass("card--fullscreen"), $('body').removeClass("data-table-toggled")) : (a.addClass("card--fullscreen"), $('body').addClass("data-table-toggled"))
+            }
+        });
+    });
+
+    let users = JSON.parse(`<%- JSON.stringify(users) %>`);
+    let backgrounds = JSON.parse(`<%- JSON.stringify(backgrounds) %>`);
+    let bIsAvatarChanged = false;
+    function selectAvatarFromFile(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        for (let i = 0; i<evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                $('#user-avatar').attr('src', event.target.result);
+                bIsAvatarChanged = true;
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+
+    function enableChangePassword() {
+        $('#password').val("");
+        $('#confirm_password').val("");
+
+        if ($('#enable_change_password').prop('checked') == true) {
+            $('#password').prop('readonly', false);
+            $('#confirm_password').prop('readonly', false);
+            $('#password').prop('required', true);
+            $('#confirm_password').prop('required', true);
+        } else {
+            $('#password').prop('readonly', true);
+            $('#confirm_password').prop('readonly', true);
+            $('#password').prop('required', false);
+            $('#confirm_password').prop('required', false);
+        }
+    }
+    function activeUser(id) {
+        let url = '/admin/editUser';
+        let data = {
+            id: id,
+            type: 'active',
+        };
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else customAlert(res.message);
+            }
+        })
+    }
+    function blockUser(id) {
+        let url = '/admin/editUser';
+        let data = {
+            id: id,
+            type: 'block',
+        };
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else customAlert(res.message);
+            }
+        })
+    }
+    function addUser() {
+        $('#enable_change_password').prop('checked', true);
+        $('.enable_change_password').hide();
+        enableChangePassword();
+
+        $('#modal-user').find('input, select').each(function () {
+            if ($(this).prop('required')) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        $('#modal-user .modal-title').html('Add New Client');
+        $('#modal_user_id').val("")
+        $('#user-avatar').attr('src', '');
+        $('#user_name').val("");
+        $('#email').val("");
+        $('#phone_number').val("");
+        $('#monthly_token').val("");
+
+        bIsAvatarChanged = false;
+        $('#modal-user').modal();
+    }
+    function editUser(id) {
+        $('.enable_change_password').show();
+        $('#modal-user').find('input, select').each(function () {
+            if ($(this).prop('required')) {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        $('#modal-user .modal-title').html('Edit Client Profile');
+        $('#modal_user_id').val(id);
+        $('#user-avatar').attr('src', users.find(x => x.id == id).avatar);
+        $('#user_name').val(users.find(x => x.id == id).username);
+        $('#email').val(users.find(x => x.id == id).email);
+        $('#phone_number').val(users.find(x => x.id == id).phone);
+        $('#monthly_token').val(users.find(x => x.id == id).monthly_token);
+
+        bIsAvatarChanged = false;
+        $('#modal-user').modal();
+    }
+    function submitChangeUser() {
+        let bValid = true;
+        $('#modal-user').find('input, select').each(function () {
+            if ($(this).prop('required') && ($(this).val() == null || $(this).val() == "")) {
+                $(this).addClass('is-invalid');
+                bValid = false;
+            } else {
+                $(this).removeClass('is-invalid');
+            }
+        });
+        let password = $('#password').val();
+        let confirm_password = $('#confirm_password').val();
+        if (password != confirm_password) {
+            $('#confirm_password').addClass('is-invalid');
+            bValid = false;
+        }
+
+        if (!bValid) return;
+
+
+        let id = $('#modal_user_id').val();
+        let username = $('#user_name').val();
+        let email = $('#email').val();
+        let phone = $('#phone_number').val();
+        let monthly_token = $('#monthly_token').val();
+        let password_flag = $('#enable_change_password').prop('checked');
+        let user_avatar = $('#user-avatar').attr('src');
+        let url = '/admin/editUser';
+
+        if (id != "") {
+            let data = {
+                id: id,
+                username: username,
+                email: email,
+                phone: phone,
+                monthly_token: monthly_token,
+                password_flag: password_flag,
+                password: password,
+                bIsAvatarChanged: bIsAvatarChanged,
+                user_avatar: user_avatar,
+                type: 'edit',
+            };
+            $.ajax({
+                url: url,
+                method: 'post',
+                data: data,
+                success: function (res) {
+                    if (res.status === 'success') {
+                        customAlert(res.message, true);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 500);
+                    } else customAlert(res.message);
+                }
+            })
+        } else {
+            let data = {
+                username: username,
+                email: email,
+                phone: phone,
+                password: password,
+                monthly_token: monthly_token,
+                bIsAvatarChanged: bIsAvatarChanged,
+                user_avatar: user_avatar,
+                type: 'add',
+            };
+            $.ajax({
+                url: url,
+                method: 'post',
+                data: data,
+                success: function (res) {
+                    if (res.status === 'success') {
+                        customAlert(res.message, true);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 500);
+                    } else customAlert(res.message);
+                }
+            })
+        }
+    }
+
+    function removeUser(id) {
+        $('#modal_delete_id').val(id);
+        $('#modal_delete_message').modal();
+    }
+
+    function onDeleteBtn() {
+        let id = $('#modal_delete_id').val();
+        let data = {
+            id: id,
+            type: 'remove',
+        };
+        let url = '/admin/editUser';
+        $.ajax({
+            url: url,
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+    function chooseBackground(id) {
+        $('#selected-userid').val(id);
+        $('#btn-upload-user-bg').prop('disabled', true);
+        $('#user-background').attr('src', '');
+        $('#user-background').attr('src', users.find(x => x.id == id).background_url);
+    }
+    function mouseonBackground(evt) {
+        $(evt).removeAttr('class');
+        $(evt).addClass('animated rubberBand');
+        setTimeout(function () {
+            $(evt).removeClass('rubberBand');
+        }, 1000);
+
+    }
+    function selectBackground(evt) {
+        $(evt).removeAttr('class');
+        $(evt).addClass('animated rollOut');
+        setTimeout(function () {
+            $(evt).removeClass('rollOut');
+        }, 1000);
+
+        let background_url = $(evt).attr('src');
+        let background_id = $(evt).attr('id');
+        let user_id = $('#selected-userid').val();
+        let data = {
+            user_id: user_id,
+            background_id: background_id,
+            background_url: background_url,
+            type: 'set-background',
+        };
+        $.ajax({
+            url: '/admin/editUser',
+            method: 'post',
+            data: data,
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else customAlert(res.message);
+            }
+        })
+    }
+    function selectBackgroundFromFile(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        for (let i = 0; i<evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                $('#user-background').attr('src', event.target.result);
+                $('#btn-upload-user-bg').prop('disabled', false);
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+    function uploadUserBackgroundToServer(){
+        let background_data = $('#user-background').attr('src');
+        let user_id = $('#selected-userid').val();
+        $.ajax({
+            url: '/admin/editUser',
+            method: 'post',
+            data: {
+                user_id: user_id,
+                background_data: background_data,
+                type: 'background-upload-set',
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                }
+                else customAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

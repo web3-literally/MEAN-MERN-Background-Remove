@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1>Welcome <%=user.username%>!</h1>
+        </header>
+
+        <div class="row price-table price-table--highlight">
+            <div class="col-md-4">
+                <div class="price-table__item">
+                    <header class="price-table__header">
+                        <div class="price-table__title"><h3>Allocation Credits</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        <%=user.monthly_token%> Credits |
+                        <small>month</small>
+                    </div>
+                    <ul class="price-table__info">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="price-table__item price-table__item--popular">
+                    <header class="price-table__header">
+                        <div class="price-table__title"><h3>Processed Images</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        <%=user.processed_count%> Images |
+                        <small>so far</small>
+                    </div>
+                    <ul class="price-table__info">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="price-table__item">
+                    <header class="price-table__header">
+                        <div class="price-table__title"><h3>Remain Credits</h3></div>
+                    </header>
+                    <div class="price-table__price">
+                        <%=user.remain_token%> Credits |
+                        <small>total</small>
+                    </div>
+                    <ul class="price-table__info">
+                        <li></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+
+</body>
+</html>

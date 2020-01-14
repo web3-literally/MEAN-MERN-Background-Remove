@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<style>
+    #filedrag {
+        display: none;
+        font-weight: bold;
+        text-align: center;
+        padding: 1em 0;
+        margin: 1em 0;
+        color: #555;
+        border: 2px dashed #555;
+        border-radius: 7px;
+        cursor: default;
+    }
+
+    #filedrag.hover {
+        color: #f00;
+        border-color: #f00;
+        border-style: solid;
+        box-shadow: inset 0 3px 4px #888;
+    }
+
+    #filedrag img {
+        width: 180px;
+        height: 150px;
+    }
+
+    .upload-item-image {
+        display: inline-block;
+        margin: 1%;
+        position: relative;
+    }
+
+    .upload-item-image i {
+        position: absolute;
+        /*width: 15px;*/
+        /*height: 15px;*/
+        top: -3px;
+        right: -3px;
+        /*background: red;*/
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .photos__item i {
+        position: absolute;
+        /*width: 15px;*/
+        /*height: 15px;*/
+        top: -3px;
+        right: -3px;
+        /*background: red;*/
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .row.lightbox-photos .main-image-item .checkImg {
+        position: absolute;
+        font-size: 60px;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 50%;
+        color: white;
+        width: auto;
+        height: auto;
+        pointer-events: none;
+        display: none;
+        text-shadow: 2px 2px 2px black;
+    }
+
+    .row.lightbox-photos .main-image-item[data-sel="1"] .checkImg {
+        display: block;
+    }
+
+    .row.lightbox-photos .main-image-item:hover {
+        opacity: 0.8;
+    }
+</style>
+<body data-sa-theme="<%= theme_index %>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Background Setting') %></h1>
+            <div class="actions">
+                <a href="" class="actions__item zwicon-cog"></a>
+                <a href="" class="actions__item zwicon-refresh-double"></a>
+
+                <div class="dropdown actions__item">
+                    <i data-toggle="dropdown" class="zwicon-more-h"></i>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a href="" class="dropdown-item">Refresh</a>
+                        <a href="" class="dropdown-item">Manage Widgets</a>
+                        <a href="" class="dropdown-item">Settings</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="card">
+            <div class="card-body">
+                <div class="uploading-image">
+                    <div class="form-group">
+                        <input type="file" name="fileselect[]" id="fileselect" style="display: none;" accept="image/*" multiple="multiple">
+                        <button class="btn btn-success mr-3" onclick="$('#fileselect').click();">Select Background</button>
+                        <button class="btn btn-warning" onclick="uploadBackgroundToServer()">Upload Background</button>
+                    </div>
+                </div>
+                <div id="filedrag">Drop Image Files Here!</div>
+            </div>
+        </div>
+        <div class="toolbar">
+            <div class="toolbar__label"><span class="hidden-xs-down">Total</span> <%= backgrounds.length %> Backgrounds</div>
+            <div class="actions">
+                <i class="actions__item zwicon-search" data-sa-action="toolbar-search-open"></i>
+                <a href="" class="actions__item zwicon-clock"></a>
+                <div class="dropdown actions__item">
+                    <i class="zwicon-filter-alt" data-toggle="dropdown"></i>
+
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a href="" class="dropdown-item">Last Modified</a>
+                        <a href="" class="dropdown-item">Name</a>
+                        <a href="" class="dropdown-item">Size</a>
+                    </div>
+                </div>
+                <a href="" class="actions__item zwicon-info-circle"></a>
+            </div>
+            <div class="toolbar__search">
+                <input type="text" placeholder="Search...">
+                <i class="toolbar__search__close zwicon-arrow-left" data-sa-action="toolbar-search-close"></i>
+            </div>
+        </div>
+        <div class="row lightbox-photos">
+
+        </div>
+        <div class="text-center mt-3">
+            <button class="btn btn-success w-25" id='load_more' onclick="loadMore()">Load More</button>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="modal-image-setting" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Setting</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modify-userid">
+                <div class="row m-0">
+                    <div class="custom-control custom-radio mb-2 mr-3">
+                        <input type="radio" id="customRadio1" name="visibleRadio" class="custom-control-input" value="Visible">
+                        <label class="custom-control-label" for="customRadio1" style="color: greenyellow;">Visible</label>
+                    </div>
+                    <div class="custom-control custom-radio mb-2">
+                        <input type="radio" id="customRadio2" name="visibleRadio" class="custom-control-input" value="Hidden">
+                        <label class="custom-control-label" for="customRadio2" style="color: yellow;">Hidden</label>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0 text-center">
+                        <thead>
+                        <tr>
+                            <th style="color: greenyellow;">No</th>
+                            <th style="color: greenyellow;">Photo</th>
+                            <th style="color: greenyellow;">Username</th>
+                            <th style="color: greenyellow;">Email</th>
+                        </tr>
+                        </thead>
+                        <tbody class="user-list">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" onclick="submitDelete()">Delete</button>
+                <button type="button" class="btn btn-outline-success" onclick="submitChange()">Save Changes</button>
+                <button type="button" class="btn btn-outline-warning" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-image-process" data-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body row justify-content-center">
+                <div class="page-loader__spinner">
+                    <svg viewBox="25 25 50 50">
+                        <circle cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                    </svg>
+                </div>
+                <h4 class="text-center pt-3" id='image-process-wait' style="color: greenyellow; vertical-align: middle;">Image Processing...</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    let visibleMode = false;
+    let users = JSON.parse(`<%- JSON.stringify(users) %>`);
+    let backgrounds = JSON.parse(`<%- JSON.stringify(backgrounds) %>`);
+    let nCount = 0;
+
+    $(document).ready(function () {
+        if (backgrounds.length > 8){
+            nCount = 8;
+            $('#load_more').show();
+        }
+        else {
+            nCount = backgrounds.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = 0; i < nCount; i++) {
+            let background_item = '<div class="col-md-3 col-6 m-0 p-1 photo-group-item" id="' + backgrounds[i].id + '">\n' +
+                '            <div class="row p-1 m-0" style="border: 1px solid gray;" onclick=\'background_setting(this, "' + backgrounds[i].id + '")\'>\n' +
+                '            <i class="zwicon-cog image-setting-icon" style="font-size: 2rem; color:greenyellow;"></i>\n' +
+                '            <label class="pt-1 ml-3" style="font-size: 15px;color: greenyellow;">Users: ' + backgrounds[i].user_list.length + '</label>\n' +
+                '        </div>\n' +
+                '            <div class="main-image-item" data-sel=\'' + (backgrounds[i].visible_flag == true ? 0 : 1) + '\'>\n' +
+                '            <div class="lightbox__item photos__item">\n' +
+                '            <img src="' + backgrounds[i].url + '" alt="" width="100%" onmouseenter="mouseonBackground(this)"/>\n' +
+                '            </div>\n' +
+                '            <div class="checkImg" style="color: red;"><i class="zwicon-eye-slash"></i></div>\n' +
+                '        </div>\n' +
+                '        </div>\n' +
+                '        </div>'
+            $('.lightbox-photos').append(background_item);
+        }
+    });
+    
+    function loadMore() {
+        for (let i = nCount; i < backgrounds.length; i++) {
+            let background_item = '<div class="col-md-3 col-6 m-0 p-1 photo-group-item" id="' + backgrounds[i].id + '">\n' +
+                '            <div class="row p-1 m-0" style="border: 1px solid gray;" onclick=\'background_setting(this, "' + backgrounds[i].id + '")\'>\n' +
+                '            <i class="zwicon-cog image-setting-icon" style="font-size: 2rem; color:greenyellow;"></i>\n' +
+                '            <label class="pt-1 ml-3" style="font-size: 15px;color: greenyellow;">Users: ' + backgrounds[i].user_list.length + '</label>\n' +
+                '        </div>\n' +
+                '            <div class="main-image-item" data-sel=\'' + (backgrounds[i].visible_flag == true ? 0 : 1) + '\'>\n' +
+                '            <div class="lightbox__item photos__item">\n' +
+                '            <img src="' + backgrounds[i].url + '" alt="" width="100%" onmouseenter="mouseonBackground(this)"/>\n' +
+                '            </div>\n' +
+                '            <div class="checkImg" style="color: red;"><i class="zwicon-eye-slash"></i></div>\n' +
+                '        </div>\n' +
+                '        </div>\n' +
+                '        </div>'
+            $('.lightbox-photos').append(background_item);
+        }
+        $('#load_more').hide();
+    }
+    function selectedImages(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        $('#filedrag').empty();
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let dom_nodes = $($.parseHTML('<div class="upload-item-image"><img/><i ' +
+                    'class="zwicon-close-circle" style="font-size: 2rem; color:red;" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#filedrag');
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+
+    function remove_image_item(evt) {
+        $(evt).parent().remove();
+    }
+
+    function background_setting(evt, id) {
+        $('#modify-userid').val(id);
+        let background = backgrounds.find(x => x.id == id);
+        if (background.visible_flag == true) {
+            $("input[name='visibleRadio'][value='Visible']").prop('checked', true);
+        } else {
+            $("input[name='visibleRadio'][value='Hidden']").prop('checked', true);
+        }
+
+        $('.user-list').empty();
+        let user_list = background.user_list;
+        if (user_list && user_list.length > 0) {
+            console.log(user_list);
+            let innerHtml = "";
+            for (let i = 0; i < user_list.length; i++) {
+                let _user = users.find(x => x.id == user_list[i]);
+                if (_user) {
+                    innerHtml += '<tr>\n' +
+                        '<th scope="row">' + (i + 1) + '</th>\n' +
+                        '<td><img src="' + _user.avatar + '" style="width: 50px;"></td>\n' +
+                        '<td>' + _user.username + '</td>\n' +
+                        '<td>' + _user.email + '</td>\n' +
+                        '</tr>';
+                }
+            }
+            $('.user-list').append(innerHtml);
+        }
+        $('#modal-image-setting').modal();
+    }
+
+    function uploadBackgroundToServer() {
+        let background_data = [];
+        $('.upload-item-image').find('img').each(function () {
+            let image_data = $(this).attr('src');
+            background_data.push(image_data);
+        });
+
+        if (background_data.length > 10) {
+            customAlert("Selected Image Count is over than 10!");
+            return;
+        } else if (background_data.length == 0) {
+            customAlert("Please select Images!");
+            return;
+        }
+
+        customAlert("Sent Request For Image Process!", true);
+        $('.result-images').empty();
+        $('#image-process-wait').html('Image Uploading...( Total : ' + background_data.length + ')');
+        $('#modal-image-process').modal();
+
+        $.ajax({
+            url: '/admin/setting/upload-backgrounds',
+            method: 'post',
+            data: {
+                background_data: background_data,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 500);
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+    function mouseonBackground(evt) {
+        $(evt).removeAttr('class');
+        $(evt).addClass('animated zoomIn');
+        setTimeout(function () {
+            $(evt).removeClass('zoomIn');
+        }, 1000);
+    }
+
+    function submitDelete() {
+        id = $('#modify-userid').val();
+        $.ajax({
+            url: '/admin/setting/delete-backgrounds',
+            method: 'post',
+            data: {
+                background_id: id,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-image-setting').modal('hide');
+                    customAlert(res.message, true);
+                    $('#' + id).remove();
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+    function submitChange() {
+        id = $('#modify-userid').val();
+        let visible = $("input[name='visibleRadio']:checked").val();
+        $.ajax({
+            url: '/admin/setting/visible-backgrounds',
+            method: 'post',
+            data: {
+                background_id: id,
+                visible: visible,
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-image-setting').modal('hide');
+                    customAlert(res.message, true);
+                    if (visible == "Visible") {
+                        $('#' + id).find('.main-image-item').removeAttr('data-sel');
+                    } else {
+                        $('#' + id).find('.main-image-item').attr('data-sel', 1);
+                    }
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+
+    //================ About Images Drag & Drop =================
+    if (window.File && window.FileList && window.FileReader) {
+        Init();
+    }
+
+    function Init() {
+
+        var fileselect = $id("fileselect"),
+            filedrag = $id("filedrag");
+
+        // file select
+        fileselect.addEventListener("change", selectedImages, false);
+
+        // is XHR2 available?
+        var xhr = new XMLHttpRequest();
+        if (xhr.upload) {
+
+            // file drop
+            filedrag.addEventListener("dragover", FileDragHover, false);
+            filedrag.addEventListener("dragleave", FileDragHover, false);
+            filedrag.addEventListener("drop", FileSelectHandler, false);
+            filedrag.style.display = "block";
+        }
+    }
+
+    // getElementById
+    function $id(id) {
+        return document.getElementById(id);
+    }
+
+    // file drag hover
+    function FileDragHover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.target.className = (e.type == "dragover" ? "hover" : "");
+    }
+
+    // file selection
+    function FileSelectHandler(e) {
+        FileDragHover(e);
+        var files = e.target.files || e.dataTransfer.files;
+        if (!files.length) return;
+        $('#filedrag').empty();
+        for (let i = 0; i < files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let dom_nodes = $($.parseHTML('<div class="upload-item-image"><img/><i ' +
+                    'class="zwicon-close-circle" style="font-size: 2rem; color:red;" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#filedrag');
+            }
+            reader.readAsDataURL(files[i]);
+        }
+    }
+</script>
+</body>
+</html>

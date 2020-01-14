@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+
+<div class="page-loader">
+    <div class="page-loader__spinner">
+        <svg viewBox="25 25 50 50">
+            <circle cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+</div>
+
+<div class="login">
+
+    <!-- Forgot Password -->
+    <div class="login__block active" id="l-forget-password">
+        <div class="login__block__header">
+            <div class="login__logo">
+                <img src="/images/logo.png">
+                <p>Send email verification</p>
+            </div>
+
+            <div class="actions actions--inverse login__block__actions">
+                <div class="dropdown">
+                    <i data-toggle="dropdown" class="zwicon-more-h actions__item"></i>
+
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/auth/login"><%= i18n.__('Already have an account') %>?</a>
+                        <a class="dropdown-item" href="/auth/register"><%= i18n.__('Create an account') %></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login__block__body">
+            <div class="form-group">
+                <input type="text" class="form-control text-center" id="verify_email" placeholder="<%= i18n.__('Email Address') %>">
+            </div>
+            <button class="btn btn-outline-primary" id="submit_resend_email" onclick="resendEmailVerification()"><%= i18n.__('Resend code') %></button>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script src="/main/js/auth.js"></script>
+<script>
+    let messages = [
+        '<%= i18n.__("Email is empty") %>',
+        '<%= i18n.__("Email format is wrong") %>'
+    ]
+</script>
+</body>
+</html>

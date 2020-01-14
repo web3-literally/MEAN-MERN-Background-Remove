@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<style>
+    #filedrag {
+        display: none;
+        font-weight: bold;
+        text-align: center;
+        padding: 1em 0;
+        margin: 1em 0;
+        color: #555;
+        border: 2px dashed #555;
+        border-radius: 7px;
+        cursor: default;
+    }
+
+    #filedrag.hover {
+        color: #f00;
+        border-color: #f00;
+        border-style: solid;
+        box-shadow: inset 0 3px 4px #888;
+    }
+
+    #filedrag img {
+        width: 180px;
+        height: 150px;
+    }
+
+    .upload-item-image {
+        display: inline-block;
+        margin: 1%;
+        position: relative;
+    }
+
+    .upload-item-image i {
+        position: absolute;
+        /*width: 15px;*/
+        /*height: 15px;*/
+        top: -3px;
+        right: -3px;
+        /*background: red;*/
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .photos__item i {
+        position: absolute;
+        /*width: 15px;*/
+        /*height: 15px;*/
+        top: -3px;
+        right: -3px;
+        /*background: red;*/
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        font-weight: bold;
+    }
+</style>
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('IMAGE PROCESS') %></h1>
+        </header>
+        <hr>
+        <div class="row">
+            <div class="col-md-8 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title text-center">Please Select Your Photo</h1>
+                        <hr>
+                        <div class="uploading-image">
+                            <div class="form-group text-right">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="customRadioInline1" name="radio-cutter-type" class="custom-control-input" value="normal" checked>
+                                    <label class="custom-control-label" for="customRadioInline1">Half-Cutter</label>
+                                </div>
+                                <!--<div class="custom-control custom-radio custom-control-inline">-->
+                                    <!--<input type="radio" id="customRadioInline2" name="radio-cutter-type" class="custom-control-input" value="complete">-->
+                                    <!--<label class="custom-control-label" for="customRadioInline2">Complete-Cutter</label>-->
+                                <!--</div>-->
+                                <!--<div class="custom-control custom-radio custom-control-inline">-->
+                                    <!--<input type="radio" id="customRadioInline3" name="radio-cutter-type" class="custom-control-input" value="blur">-->
+                                    <!--<label class="custom-control-label" for="customRadioInline3">Blur-Cutter</label>-->
+                                <!--</div>-->
+
+                                <input type="file" name="fileselect[]" id="fileselect" style="display: none;" accept="image/*" multiple="multiple">
+                                <button class="btn btn-outline-warning mt-2" onclick="$('#fileselect').click();">Select Image</button>
+                            </div>
+                        </div>
+                        <div id="filedrag">Drop Image Files Here!</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="card-title text-center">Your Current Background</h1>
+                        <hr>
+                        <div class="text-right">
+                            <a href="/background-remove" class="btn btn-outline-success mb-2">Select Background</a>
+                            <img class="w-100" id="background-image" src="<%= user.background_url %>"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center">Result Images</h3>
+                <hr>
+                <div class="text-right mb-2 row">
+                    <button class="btn btn-outline-success mt-2 ml-3" id='btn-image-process' onclick="ImageProcess()" disabled>Image Process</button>
+                    <button class="btn btn-outline-danger mt-2 ml-3" id='btn-download-all' onclick="DownloadAll()" disabled>Download All</button>
+                </div>
+                <div class="result-images row">
+
+                </div>
+                <hr>
+                <h3 class="card-title text-center">Recent 2 Day's History</h3>
+                <hr>
+                <div class="recent-images row">
+                </div>
+                <div class="text-center m-3">
+                    <button class="btn btn-success w-25" id='load_more' onclick="loadMore()">Load More</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="modal-image-process" data-backdrop="static" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body row justify-content-center">
+                <div class="page-loader__spinner">
+                    <svg viewBox="25 25 50 50">
+                        <circle cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"/>
+                    </svg>
+                </div>
+                <h4 class="text-center pt-3" id='image-process-wait' style="color: greenyellow; vertical-align: middle;">Image Processing...</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let activities = JSON.parse(`<%- JSON.stringify(activities) %>`);
+    let nCount = 0;
+
+    $(document).ready(function () {
+        if (activities.length > 4){
+            nCount = 4;
+            $('#load_more').show();
+        }
+        else {
+            nCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = 0; i < nCount; i++) {
+            let activity_item = '<div class="col-md-3 col-6 mt-2">\n' +
+                '                            <a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'">\n' +
+                '                                <img style="width: 100%" src="'+ activities[i].result_url +'">\n' +
+                '                            </a>\n' +
+                '                        </div>';
+            $('.recent-images').append(activity_item);
+        }
+    });
+
+    function loadMore() {
+        let moreCount = 0;
+        if (activities.length > nCount + 4){
+            moreCount = nCount + 4;
+            $('#load_more').show();
+        }
+        else {
+            moreCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = nCount; i < moreCount; i++) {
+            let activity_item = '<div class="col-md-3 col-6 mt-2">\n' +
+                '                            <a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'">\n' +
+                '                                <img style="width: 100%" src="'+ activities[i].result_url +'">\n' +
+                '                            </a>\n' +
+                '                        </div>';
+            $('.recent-images').append(activity_item);
+        }
+
+        nCount = moreCount;
+    }
+
+    function selectedImages(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        $('#filedrag').empty();
+        for (let i = 0; i < evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let dom_nodes = $($.parseHTML('<div class="upload-item-image"><img/><i ' +
+                    'class="zwicon-close-circle" style="font-size: 2rem; color:red;" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#filedrag');
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+        $('#btn-image-process').prop('disabled', false);
+        $('#btn-download-all').prop('disabled', true);
+    }
+
+    function remove_image_item(evt) {
+        $(evt).parent().remove();
+    }
+
+    function ImageProcess() {
+        let image_data_list = [];
+        $('.upload-item-image').find('img').each(function () {
+            let image_data = $(this).attr('src');
+            image_data_list.push(image_data);
+        });
+        let image_processed_count = 0;
+        let image_total_count = image_data_list.length;
+
+        let cutter_type = $("input[name='radio-cutter-type']:checked").val();
+
+        customAlert("Sent Request For Image Process!", true);
+        $('.result-images').empty();
+        $('#image-process-wait').html('Image Processing...( Total : ' + image_total_count + '/ Processed : ' + image_processed_count + ')');
+        $('#modal-image-process').modal();
+
+        const proc_image= function(){
+            if (image_data_list.length == 0){
+                setTimeout(function () {
+                    $('#modal-image-process').modal('hide');
+                    $('#btn-download-all').prop('disabled', false);
+                }, 1000);
+                return;
+            }
+
+            $.ajax({
+                url: '/make-logo',
+                method: 'post',
+                data: {
+                    upload_image: image_data_list[0],
+                    cutter_type: cutter_type,
+                },
+                success: function (res) {
+                    if (res.status === 'success') {
+                        image_processed_count++;
+                        customAlert(res.message + '(' + image_processed_count + ')', true);
+                        let logo_image = res.logo_image;
+                        let img_tag = '<div class="col-md-3 col-6 mt-2"> ' +
+                            '<a href="' + logo_image + '" download="' + logo_image + '">' +
+                            '<img style="width: 100%;" src="' + logo_image + '"/>'; +
+                            '</a>' +
+                        '</div>';
+                        $('.result-images').append(img_tag);
+                        image_data_list.splice(0, 1);
+                    } else if (res.status === 'api-failed'){
+                        image_processed_count++;
+                        customAlert(res.message + '(' + image_processed_count + ')');
+                        image_data_list.splice(0, 1);
+                    } else {
+                        console.log(res);
+                    }
+                    $('#image-process-wait').html('Image Processing...( Total : ' + image_total_count + '/ Processed : ' + image_processed_count + ')');
+                    proc_image();
+                },
+                error: function(e){
+                    console.log(e);
+                    proc_image();
+                },
+                timeout: 500000
+            });
+        }
+
+        proc_image();
+
+    }
+
+    function DownloadAll() {
+        let items = $('.result-images').find('a');
+        for (let i = 0; i < items.length; i++){
+            items[i].click();
+        }
+    }
+
+    if (window.File && window.FileList && window.FileReader) {
+        Init();
+    }
+
+    function Init() {
+
+        var fileselect = $id("fileselect"),
+            filedrag = $id("filedrag");
+
+        // file select
+        fileselect.addEventListener("change", selectedImages, false);
+
+        // is XHR2 available?
+        var xhr = new XMLHttpRequest();
+        if (xhr.upload) {
+
+            // file drop
+            filedrag.addEventListener("dragover", FileDragHover, false);
+            filedrag.addEventListener("dragleave", FileDragHover, false);
+            filedrag.addEventListener("drop", FileSelectHandler, false);
+            filedrag.style.display = "block";
+        }
+    }
+
+    // getElementById
+    function $id(id) {
+        return document.getElementById(id);
+    }
+
+    // file drag hover
+    function FileDragHover(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.target.className = (e.type == "dragover" ? "hover" : "");
+    }
+
+    // file selection
+    function FileSelectHandler(e) {
+        FileDragHover(e);
+        var files = e.target.files || e.dataTransfer.files;
+        if (!files.length) return;
+        $('#filedrag').empty();
+        for (let i = 0; i < files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                let dom_nodes = $($.parseHTML('<div class="upload-item-image"><img/><i ' +
+                    'class="zwicon-close-circle" style="font-size: 2rem; color:red;" onclick="remove_image_item(this)"></i></div>'));
+                dom_nodes.find('img').attr('src', event.target.result);
+                dom_nodes.appendTo('#filedrag');
+            }
+            reader.readAsDataURL(files[i]);
+        }
+        $('#btn-image-process').prop('disabled', false);
+    }
+</script>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+</body>
+</html>

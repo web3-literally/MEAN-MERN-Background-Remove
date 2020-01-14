@@ -1,0 +1,33 @@
+/* alert style */
+.custom-alert {
+    position: fixed;
+    z-index: 999999;
+    bottom: calc(10vh);
+    max-width: calc(70vw);
+    min-width: calc(20vw);
+    left: 50%;
+    -webkit-transform: translate(-50%, 0);
+    -moz-transform: translate(-50%, 0);
+    -ms-transform: translate(-50%, 0);
+    -o-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+}
+
+/* message notification style */
+.custom-message-notifications {
+    position: fixed;
+    z-index: 99999;
+    top: calc(5vh);
+    right: 1%;
+    width: calc(33vw);
+}
+@media (max-width: 900px) {
+    .custom-message-notifications {
+        width: calc(50vw);
+    }
+}
+@media (max-width: 450px) {
+    .custom-message-notifications {
+        width: calc(90vw);
+    }
+}

@@ -1,0 +1,112 @@
+.dataTables_length select option {
+    background: #192c47;
+}
+.page-select option {
+    background: #160e1c;
+}
+/* Account Settings */
+.table-responsive>.table-bordered {
+    border: 1px solid transparent;
+}
+#b2b_principle_div {
+    padding-top: 1%;
+    text-align: center;
+}
+#business_download_div, #business_save_div {
+    text-align: center;
+}
+#history_business_agreement_wrapper .dataTables_actions {
+    display: none;
+}
+#email_notify_table thead th, #sms_notify_table thead th, #browser_notify_table thead th {
+    border: none;
+}
+.toggle-switch {
+    display: block;
+}
+#payments h3 {
+    text-align: center;
+}
+.bank-payment {
+    padding-top: 7%;
+    padding-left: 5%;
+    padding-right: 5%;
+    border: grey 1px solid;
+}
+.bank-payment h5 {
+    text-align: center;
+}
+#bank_payment_td {
+    word-break: break-all;
+}
+#bank_payment_confirm_code {
+    display: none;
+}
+.bank-payment-buttons {
+    padding: 5%;
+    text-align: center;
+}
+#add_bank_payment_button {
+    display: none;
+}
+
+.add-coin-payments {
+    padding-top: 3%;
+}
+#coin_payment_confirm_code {
+    display: none;
+}
+.add-coin-payments-buttons {
+    text-align: center;
+}
+#add_coin_payment_button {
+    display: none;
+}
+
+/* E-wallet */
+#withdraw-table {
+    text-align: center;
+}
+#modal_withdraw .modal-body h3 {
+    text-align: center;
+}
+#modal_withdraw .modal-body h2 {
+    text-align: center;
+    padding: 5%;
+}
+#modal_withdraw .modal-body h5 {
+    text-align: right;
+    padding-top: 5%;
+    text-transform: uppercase;
+}
+/* withdraw orders */
+#modal_accept_withdraw .modal-body {
+    text-align: center;
+}
+#modal_reject_withdraw .modal-body {
+    text-align: center;
+}
+/* Admin Message */
+.admin-message-actions i {
+    padding: 0 5%;
+    cursor: pointer;
+}
+.admin-message-actions i:hover {
+    color: green;
+}
+#modal_delete_message .modal-body {
+    text-align: center;
+}
+
+
+/* JWG style !! */
+label.jwg_circle {
+    padding: 15px 20px;
+    border: 1px solid rgba(255,255,255,.5);
+    border-radius: 50%;
+}
+
+
+.table-bordered td {
+    vertical-align: middle;
+}

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<style>
+
+    .row.lightbox.photos a .checkImg {
+        position: absolute;
+        font-size: 40px;
+        -webkit-transform: translate(-50%, -50%);
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        left: 50%;
+        top: 50%;
+        color: white;
+        width: auto;
+        height: auto;
+        pointer-events: none;
+        display: none;
+        text-shadow: 2px 2px 2px black;
+    }
+
+    .row.lightbox.photos a[data-sel="1"] .checkImg {
+        display: block;
+    }
+
+    .row.lightbox.photos a:hover {
+        opacity: 0.8;
+    }
+</style>
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Background Setting') %></h1>
+
+            <div class="actions">
+                <a href="" class="actions__item zwicon-cog"></a>
+                <a href="" class="actions__item zwicon-refresh-double"></a>
+
+                <div class="dropdown actions__item">
+                    <i data-toggle="dropdown" class="zwicon-more-h"></i>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a href="" class="dropdown-item">Refresh</a>
+                        <a href="" class="dropdown-item">Manage Widgets</a>
+                        <a href="" class="dropdown-item">Settings</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <a class="btn btn-primary mb-3" href="/help/new-message">Contact Us For Custom Background</a>
+
+        <div class="col-md-4 col-6 m-0 p-0">
+            <img class="w-100 mb-3" src="<%= user.background_url%>" alt=""/>
+        </div>
+
+        <hr>
+        <div class="card">
+            <div class="card-header">
+                <h3 style="color: greenyellow;">Custom Background Library</h3>
+            </div>
+            <div class="card-body">
+                <div class="toolbar">
+                    <div class="toolbar__label"><span class="hidden-xs-down">Total</span> <%= user_backgrounds.length%> Photos</div>
+
+                    <div class="actions">
+                        <i class="actions__item zwicon-search" data-sa-action="toolbar-search-open"></i>
+                        <a href="" class="actions__item zwicon-clock"></a>
+                        <div class="dropdown actions__item">
+                            <i class="zwicon-filter-alt" data-toggle="dropdown"></i>
+
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="" class="dropdown-item">Last Modified</a>
+                                <a href="" class="dropdown-item">Name</a>
+                                <a href="" class="dropdown-item">Size</a>
+                            </div>
+                        </div>
+                        <a href="" class="actions__item zwicon-info-circle"></a>
+                    </div>
+
+                    <div class="toolbar__search">
+                        <input type="text" placeholder="Search...">
+                        <i class="toolbar__search__close zwicon-arrow-left" data-sa-action="toolbar-search-close"></i>
+                    </div>
+                </div>
+
+                <div class="row lightbox photos">
+                    <% for (let i = 0; i < user_backgrounds.length; i++){ %>
+                        <a href="<%= user_backgrounds[i].url %>" class="col-md-3 col-6" id="<%=user_backgrounds[i].id%>">
+                            <div class="lightbox__item photos__item">
+                                <img src="<%= user_backgrounds[i].url %>" alt=""/>
+                            </div>
+                            <div class="checkImg"><i class="zwicon-checkmark-circle"></i></div>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <hr>
+        <div class="card">
+            <div class="card-header">
+                <h3 style="color: greenyellow;">Server Background Library</h3>
+            </div>
+            <div class="card-body">
+                <div class="toolbar">
+                    <div class="toolbar__label"><span class="hidden-xs-down">Total</span> <%= server_backgrounds.length%> Photos</div>
+
+                    <div class="actions">
+                        <i class="actions__item zwicon-search" data-sa-action="toolbar-search-open"></i>
+                        <a href="" class="actions__item zwicon-clock"></a>
+                        <div class="dropdown actions__item">
+                            <i class="zwicon-filter-alt" data-toggle="dropdown"></i>
+
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="" class="dropdown-item">Last Modified</a>
+                                <a href="" class="dropdown-item">Name</a>
+                                <a href="" class="dropdown-item">Size</a>
+                            </div>
+                        </div>
+                        <a href="" class="actions__item zwicon-info-circle"></a>
+                    </div>
+
+                    <div class="toolbar__search">
+                        <input type="text" placeholder="Search...">
+                        <i class="toolbar__search__close zwicon-arrow-left" data-sa-action="toolbar-search-close"></i>
+                    </div>
+                </div>
+
+                <div class="row lightbox photos server-backgrounds">
+
+                </div>
+                <div class="text-center m-3">
+                    <button class="btn btn-success w-25" id='load_more' onclick="loadMore()">Load More</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    let server_backgrounds = JSON.parse(`<%- JSON.stringify(server_backgrounds) %>`);
+    let nCount = 0;
+
+    $(document).ready(function () {
+        if (server_backgrounds.length > 4){
+            nCount = 4;
+            $('#load_more').show();
+        }
+        else {
+            nCount = server_backgrounds.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = 0; i < nCount; i++) {
+            let background_item = '<a href="'+ server_backgrounds[i].url +'" class="col-md-3 col-6" id="'+ server_backgrounds[i].url +'">\n' +
+                '                            <div class="lightbox__item photos__item">\n' +
+                '                                <img src="'+ server_backgrounds[i].url +'" alt=""/>\n' +
+                '                            </div>\n' +
+                '                            <div class="checkImg"><i class="zwicon-checkmark-circle"></i></div>\n' +
+                '                        </a>';
+            $('.server-backgrounds').append(background_item);
+        }
+        selectMode();
+    });
+
+    function loadMore() {
+        let moreCount = 0;
+        if (server_backgrounds.length > nCount + 4){
+            moreCount = nCount + 4;
+            $('#load_more').show();
+        }
+        else {
+            moreCount = server_backgrounds.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = nCount; i < moreCount; i++) {
+            let background_item = '<a href="'+ server_backgrounds[i].url +'" class="col-md-3 col-6" id="'+ server_backgrounds[i].url +'">\n' +
+                '                            <div class="lightbox__item photos__item">\n' +
+                '                                <img src="'+ server_backgrounds[i].url +'" alt=""/>\n' +
+                '                            </div>\n' +
+                '                            <div class="checkImg"><i class="zwicon-checkmark-circle"></i></div>\n' +
+                '                        </a>';
+            $('.server-backgrounds').append(background_item);
+        }
+        selectMode();
+
+        nCount = moreCount;
+    }
+
+
+    function selectMode() {
+        $('.row.lightbox.photos a').attr('data-sel', 1)
+        $('.row.lightbox.photos a').off('click');
+        $('.row.lightbox.photos a').on('click', function (e) {
+            e.preventDefault();
+            var that = $(this);
+            var url = that.attr('href');
+            var background_id = that.attr('id');
+
+            let data = {
+                background_id: background_id,
+                background_url: url,
+            };
+            $.ajax({
+                url: '/select-background',
+                method: 'post',
+                data: data,
+                success: function (res) {
+                    if (res.status === 'success') {
+                        customAlert(res.message, true);
+                        setTimeout(function () {
+                            location.href = '/image-process';
+                        }, 500);
+                    } else customAlert(res.message);
+                }
+            })
+        });
+    }
+</script>
+</body>
+</html>

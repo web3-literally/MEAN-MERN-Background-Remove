@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Help & Contact') %></h1>
+        </header>
+        <div class="row">
+            <div class="col-md-3 col-12"></div>
+            <div class="col-md-6 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><%= i18n.__('NEW MESSAGE') %></h5>
+                        <hr>
+                        <div>
+                            <div class="row">
+                                <label class="col-sm-3 col-form-label">SUBJECT :</label>
+                                <div class="col-sm-9">
+                                    <div class="form-group">
+                                        <input type="text" id="message_subject" class="form-control" placeholder="ENTER THE SUBJECT">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group text-center p-2" style="border:solid 1px gray">
+                                <input type="file" id="upload_input" style="display: none;" accept="image/*" onchange="selectBackgroundFromFile(event)">
+                                <img src="" id="user-background" style="width:100%;" onclick="$('#upload_input').click();" alt='Please Click Here To Select Your Image!'>
+                            </div>
+                            <div class="form-group">
+                                <textarea class="form-control" id="message_content" style="height: 200px" type="text" placeholder="<%= i18n.__('MESSAGE CONTENT') %>"></textarea>
+                            </div>
+                            <div class="form-group row px-3">
+                                <div class="custom-control custom-radio col-4">
+                                    <input type="radio" id="normal-radio" name="MessageStyle" class="custom-control-input" value="NORMAL" checked>
+                                    <label class="custom-control-label" for="normal-radio">Normal</label>
+                                </div>
+                                <div class="custom-control custom-radio col-4">
+                                    <input type="radio" id="request-radio" name="MessageStyle" class="custom-control-input" value="REQUEST">
+                                    <label class="custom-control-label" for="request-radio">Request</label>
+                                </div>
+                                <div class="custom-control custom-radio col-4">
+                                    <input type="radio" id="bugreport-radio" name="MessageStyle" class="custom-control-input" value="BUG">
+                                    <label class="custom-control-label" for="bugreport-radio">Bug</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-outline-success" onclick="SendMessage()"><%= i18n.__('Send Message') %></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-12"></div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    function selectBackgroundFromFile(evt) {
+        console.log(evt.target.files.length);
+        if (!evt.target.files.length) return;
+        for (let i = 0; i<evt.target.files.length; i++) {
+            let reader = new FileReader();
+            reader.onload = function (event) {
+                $('#user-background').attr('src', event.target.result);
+            }
+            reader.readAsDataURL(evt.target.files[i]);
+        }
+    }
+
+    function SendMessage() {
+        let message_subject = $('#message_subject').val();
+        let message_content = $('#message_content').val();
+        let user_background = $('#user-background').attr('src');
+        let message_type = $("input[name='MessageStyle']:checked").val();
+        $.ajax({
+            url: '/send-message',
+            method: 'post',
+            data: {
+                message_subject: message_subject,
+                message_content: message_content,
+                user_background: user_background,
+                message_type: message_type,
+                date: new Date(),
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-new-message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/help/sent';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Help & Contact') %></h1>
+        </header>
+        <div class="row">
+            <div class="col-md-3 col-12"></div>
+            <div class="col-md-6 col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><%= i18n.__('NEW MESSAGE') %></h5>
+                        <hr>
+                        <div class="row">
+                            <label class="col-sm-3 col-form-label">TO (EMAIL) :</label>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="email" id='user_email' class="form-control" placeholder="ENTER THE CLIENT EMAIL">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">SUBJECT :</label>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <input type="text" id='message_subject' class="form-control" placeholder="ENTER THE SUBJECT">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <textarea class="form-control" id="message_content" style="height: 200px" type="text" placeholder="<%= i18n.__('MESSAGE CONTENT') %>"></textarea>
+                        </div>
+                        <div class="text-right">
+                            <button class="btn btn-outline-success" onclick="SendMessage()"><%= i18n.__('Send Message') %></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-12"></div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+
+    function SendMessage() {
+        let user_email = $('#user_email').val();
+        let message_subject = $('#message_subject').val();
+        let message_content = $('#message_content').val();
+
+        $.ajax({
+            url: '/admin/send-message',
+            method: 'post',
+            data: {
+                user_email: user_email,
+                message_subject: message_subject,
+                message_content: message_content,
+                date: new Date(),
+            },
+            success: function (res) {
+                if (res.status === 'success') {
+                    $('#modal-new-message').modal('hide');
+                    customAlert(res.message, true);
+                    setTimeout(function () {
+                        location.href = '/admin/message-center/sent';
+                    }, 1000);
+                } else customAlert(res.message);
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

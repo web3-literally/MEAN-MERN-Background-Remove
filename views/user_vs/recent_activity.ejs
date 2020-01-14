@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1>Recent Activities</h1>
+        </header>
+
+        <div class="card">
+            <div class="card-body text-center" id="activities_content">
+                <h1 style="color: greenyellow;">Recent Activities</h1>
+            </div>
+            <div class="text-center m-3">
+                <button class="btn btn-success w-25" id='load_more' onclick="loadMore()">Load More</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    let activities = JSON.parse(`<%- JSON.stringify(activities) %>`);
+    let nCount = 0;
+
+    $(document).ready(function () {
+        if (activities.length > 4){
+            nCount = 4;
+            $('#load_more').show();
+        }
+        else {
+            nCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = 0; i < nCount; i++) {
+            let activity_item = '<hr>\n' +
+                '                <h4>\n' +
+                '                    '+ activities[i].history_date +'\n' +
+                '                </h4>\n' +
+                '                <div class="row">\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].origin_url +'" download="'+ activities[i].origin_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].origin_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].background_url +'" download="'+ activities[i].background_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].background_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].result_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                </div>';
+            $('#activities_content').append(activity_item);
+        }
+    });
+
+    function loadMore() {
+        let moreCount = 0;
+        if (activities.length > nCount + 4){
+            moreCount = nCount + 4;
+            $('#load_more').show();
+        }
+        else {
+            moreCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = nCount; i < moreCount; i++) {
+            let activity_item = '<hr>\n' +
+                '                <h4>\n' +
+                '                    '+ activities[i].history_date +'\n' +
+                '                </h4>\n' +
+                '                <div class="row">\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].origin_url +'" download="'+ activities[i].origin_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].origin_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].background_url +'" download="'+ activities[i].background_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].background_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                    <div class="col-md-4 col-12">\n' +
+                '                        <a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'">\n' +
+                '                            <img class="w-100" src="'+ activities[i].result_url +'">\n' +
+                '                        </a>\n' +
+                '                    </div>\n' +
+                '                </div>';
+            $('#activities_content').append(activity_item);
+        }
+
+        nCount = moreCount;
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Activity') %></h1>
+        </header>
+
+        <!--<button class="btn btn-theme-dark mb-3" style="color: yellow" onclick="DeleteTodayActivity()">Clear Today History</button>-->
+        <!--<button class="btn btn-theme-dark mb-3" style="color: yellow" onclick="DeleteWeekActivity()">Clear Week History</button>-->
+        <!--<button class="btn btn-theme-dark mb-3" style="color: yellow" onclick="DeleteMonthActivity()">Clear Month History</button>-->
+        <!--<button class="btn btn-theme-dark mb-3" style="color: red" onclick="DeleteTotalActivity()">Clear Total History</button>-->
+
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Activity History of 2 Day</h4>
+
+                <div class="table-responsivetext-center">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th style="color: greenyellow;">No</th>
+                            <th style="color: greenyellow;">Date</th>
+                            <th style="color: greenyellow;">User</th>
+                            <th style="color: greenyellow;">Email</th>
+                            <th style="color: greenyellow;">Origin</th>
+                            <th style="color: greenyellow;">Background</th>
+                            <th style="color: greenyellow;">Result</th>
+                            <th style="color: greenyellow;">View</th>
+                            <th style="color: greenyellow;">Download</th>
+                        </tr>
+                        </thead>
+                        <tbody id="activities_content">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="text-center mt-3">
+                    <button class="btn btn-success w-25" id='load_more' onclick="loadMore()">Load More</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="modal-detail-view" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Activity History</h5>
+            </div>
+            <div class="modal-body row">
+                <div class="col-12 col-sm-4 p-1">
+                    <img width="100%" id="origin_image" src="">
+                </div>
+                <div class="col-12 col-sm-4 p-1">
+                    <img width="100%" id="background_image" src="">
+                </div>
+                <div class="col-12 col-sm-4 p-1">
+                    <img width="100%" id="result_image" src="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- remove modal -->
+<div class="modal fade" id="modal_delete_message" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <i class="zwicon-info-circle" style="font-size: 7rem"></i>
+                </div>
+                <div class="form-group">
+                    <h3><%= i18n.__('Are you sure to remove?') %></h3>
+                </div>
+                <input type="hidden" id="modal_delete_type">
+                <input type="hidden" id="modal_delete_id">
+                <button type="button" class="btn btn-link" onclick="onDeleteBtn()"><%= i18n.__('Remove')%></button>
+                <button type="button" class="btn btn-link" data-dismiss="modal"><%= i18n.__('Cancel') %></button>
+            </div>
+        </div>
+    </div>
+</div>
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script>
+    let activities = JSON.parse(`<%- JSON.stringify(activities) %>`);
+    let users = JSON.parse(`<%- JSON.stringify(users) %>`);
+    let nCount = 0;
+
+    $(document).ready(function () {
+        if (activities.length > 4){
+            nCount = 4;
+            $('#load_more').show();
+        }
+        else {
+            nCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = 0; i < nCount; i++) {
+            let activity_item = '<tr>\n' +
+                '                            <td>'+ (i+1) +'</td>\n' +
+                '                            <td>\n' +
+                '                                ' + activities[i].history_date +'\n' +
+                '                            </td>\n' +
+                '                            <td>'+ users.find(x => x.id == activities[i].user_id).username +'</td>\n' +
+                '                            <td>'+ users.find(x => x.id == activities[i].user_id).email +'</td>\n' +
+                '                            <td><img style="width: 80px;" src="'+ activities[i].origin_url +'"></td>\n' +
+                '                            <td><img style="width: 80px;" src="' + activities[i].origin_url + '"></td>\n' +
+                '                            <td><img style="width: 80px;" src="'+ activities[i].result_url +'"></td>\n' +
+                '                            <td><button class="btn btn-outline-theme" onclick=\'viewDetail("'+ activities[i].id +'")\'>View</button></td>\n' +
+                '                            <td><a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'"><button class="btn btn-outline-theme">Download</button></a></td>\n' +
+                '                        </tr>'
+            $('#activities_content').append(activity_item);
+        }
+    });
+
+    function loadMore() {
+        let moreCount = 0;
+        if (activities.length > nCount + 4){
+            moreCount = nCount + 4;
+            $('#load_more').show();
+        }
+        else {
+            moreCount = activities.length;
+            $('#load_more').hide();
+        }
+
+        for (let i = nCount; i < moreCount; i++) {
+            let activity_item = '<tr>\n' +
+                '                            <td>'+ (i+1) +'</td>\n' +
+                '                            <td>\n' +
+                '                                ' + activities[i].history_date +'\n' +
+                '                            </td>\n' +
+                '                            <td>'+ users.find(x => x.id == activities[i].user_id).username +'</td>\n' +
+                '                            <td>'+ users.find(x => x.id == activities[i].user_id).email +'</td>\n' +
+                '                            <td><img style="width: 80px;" src="'+ activities[i].origin_url +'"></td>\n' +
+                '                            <td><img style="width: 80px;" src="' + activities[i].origin_url + '"></td>\n' +
+                '                            <td><img style="width: 80px;" src="'+ activities[i].result_url +'"></td>\n' +
+                '                            <td><button class="btn btn-outline-theme" onclick=\'viewDetail("'+ activities[i].id +'")\'>View</button></td>\n' +
+                '                            <td><a href="'+ activities[i].result_url +'" download="'+ activities[i].result_url +'"><button class="btn btn-outline-theme">Download</button></a></td>\n' +
+                '                        </tr>'
+            $('#activities_content').append(activity_item);
+        }
+
+        nCount = moreCount;
+    }
+    function viewDetail(id) {
+        $('#origin_image').attr('src', activities.find(x => x.id == id).origin_url);
+        $('#background_image').attr('src', activities.find(x => x.id == id).background_url);
+        $('#result_image').attr('src', activities.find(x => x.id == id).result_url);
+        $('#modal-detail-view').modal();
+    }
+
+    // function DeleteTodayActivity() {
+    //     $('#modal_delete_type').val('today');
+    //     $('#modal_delete_message').modal();
+    // }
+    // function DeleteWeekActivity() {
+    //     $('#modal_delete_type').val('week');
+    //     $('#modal_delete_message').modal();
+    // }
+    // function DeleteMonthActivity() {
+    //     $('#modal_delete_type').val('month');
+    //     $('#modal_delete_message').modal();
+    // }
+    // function DeleteTotalActivity() {
+    //     $('#modal_delete_type').val('total');
+    //     $('#modal_delete_message').modal();
+    // }
+
+    // function onDeleteBtn() {
+    //     let delete_type = $('#modal_delete_type').val();
+    //     $.ajax({
+    //         url: '/admin/delete-activity',
+    //         method: 'post',
+    //         data: {
+    //             delete_type: delete_type,
+    //         },
+    //         success: function (res) {
+    //             if (res.status === 'success') {
+    //                 customAlert(res.message, true);
+    //                 setTimeout(function () {
+    //                     location.reload();
+    //                 }, 1000);
+    //             }
+    //             else customAlert(res.message + '(' + image_processed_count + ')');
+    //         }
+    //     })
+    // }
+</script>
+</body>
+</html>

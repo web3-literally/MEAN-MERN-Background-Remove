@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" href="/main/tel-input/css/intlTelInput.css">
+<link rel="stylesheet" href="/main/tel-input/css/demo.css">
+<style>
+    #phone_number {
+        text-align: left !important;
+    }
+    .iti__selected-dial-code {
+        color: white;
+    }
+</style>
+<body data-sa-theme="<%=theme_index%>">
+
+<div class="page-loader">
+    <div class="page-loader__spinner">
+        <svg viewBox="25 25 50 50">
+            <circle cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+</div>
+
+<div class="login">
+
+    <!-- Forgot Password -->
+    <div class="login__block active" id="l-forget-password">
+        <div class="login__block__header">
+            <div class="login__logo">
+                <img src="/images/logo.png">
+                <p><%= i18n.__('Verify your phone') %></p>
+            </div>
+
+            <div class="actions actions--inverse login__block__actions">
+                <div class="dropdown">
+                    <i data-toggle="dropdown" class="zwicon-more-h actions__item"></i>
+
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/auth/login"><%= i18n.__('Already have an account') %>?</a>
+                        <a class="dropdown-item" href="/auth/register"><%= i18n.__('Create an account') %></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login__block__body">
+            <div class="form-group">
+                <input type="text" class="form-control text-center" id="phone_number" placeholder="<%= i18n.__('Phone number') %>">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control text-center" id="phone_verify_code" placeholder="<%= i18n.__('Phone verification code') %>" style="display: none">
+            </div>
+            <button class="btn btn-outline-primary" id="submit_phone_verify" onclick="submitPhoneVerify()"><%= i18n.__('Submit request') %></button>
+            <button class="btn btn-outline-primary" id="submit_phone_verify_code" onclick="submitPhoneVerifyCode()" style="display: none;"><%= i18n.__('Submit request') %></button>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+
+<script src="/main/tel-input/js/intlTelInput.js"></script>
+<script>
+    let messages = [
+        '<%= i18n.__("Phone number format is not valid") %>',
+        '<%= i18n.__("Phone code is empty") %>',
+    ];
+    let telInput = document.querySelector('#phone_number');
+    window.intlTelInput(telInput, {
+        separateDialCode: true,
+        initialCountry: "pl"
+    });
+    let input = document.querySelector('#phone_number');
+    let iti = window.intlTelInputGlobals.getInstance(input);
+</script>
+<script src="/main/js/auth.js"></script>
+</body>
+</html>

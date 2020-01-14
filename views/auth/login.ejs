@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+
+<body data-sa-theme="<%=theme_index%>">
+
+<div class="page-loader">
+    <div class="page-loader__spinner">
+        <svg viewBox="25 25 50 50">
+            <circle cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+</div>
+
+<div class="login">
+    <!-- Login -->
+    <div class="login__block active" id="l-login">
+        <div class="login__block__header">
+            <div class="login__logo">
+                <img src="/images/logo.png">
+                <p><%= i18n.__('Login') %></p>
+            </div>
+
+            <div class="actions actions--inverse login__block__actions">
+                <div class="dropdown">
+                    <i data-toggle="dropdown" class="zwicon-more-h actions__item"></i>
+
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="/auth/register"><%= i18n.__('Create an account') %></a>
+                        <a class="dropdown-item" href="/auth/forgot-password"><%= i18n.__('Forgot password') %>?</a>
+                        <a class="dropdown-item" href="/auth/verification-email"><%= i18n.__('Resend email verification') %></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form class="login__block__body" id="login_form">
+            <div class="form-group">
+                <input type="text" class="form-control text-center" name="login_email" placeholder="<%= i18n.__('Email Address') %>">
+            </div>
+
+            <div class="form-group">
+                <input type="password" class="form-control text-center" name="login_password" placeholder="<%= i18n.__('Password') %>">
+            </div>
+
+            <div class="form-group" id="factor2_input" style="display: none">
+                <input type="text" class="form-control text-center" name="factor2_code" placeholder="<%= i18n.__('Two Factor Code') %>">
+            </div>
+
+            <button class="btn btn-outline-primary" id="submit_login"><%= i18n.__('Login') %></button>
+        </form>
+
+    </div>
+
+</div>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script src="/main/js/auth.js"></script>
+<script>
+    let messages = [
+        '<%= i18n.__("Email is empty") %>',
+        '<%= i18n.__("Email format is wrong") %>',
+        '<%= i18n.__("Password is empty") %>'
+    ]
+</script>
+</body>
+</html>

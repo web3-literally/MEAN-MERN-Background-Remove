@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<% include ../partials/head.ejs %>
+<link rel="stylesheet" href="/main/tel-input/css/intlTelInput.css">
+
+<body data-sa-theme="<%=theme_index%>">
+<% include ../partials/header.ejs %>
+<% include ../partials/sidebar.ejs %>
+<style>
+    #upload_profile_avatar {
+        display: none;
+    }
+
+    .iti {
+        display: block;
+    }
+
+    #factor2_qr_code {
+        width: 200px;
+        height: 200px;
+        display: inline-block;
+    }
+
+    #factor2_qr_code img {
+        border: 10px solid white;
+    }
+
+    .profile__info {
+        padding: 1px 30px;
+    }
+
+    #new_profile_phone {
+        padding-left: 81px;
+    }
+</style>
+<section class="content">
+    <div class="content__inner">
+        <header class="content__title">
+            <h1><%= i18n.__('Account Settings') %></h1>
+        </header>
+        <div class="row">
+            <div class="col-lg-2"></div>
+            <div class="col-lg-8">
+                <div class="card profile">
+                    <div class="profile__img">
+                        <img src="<%= user.avatar %>" alt="Profile Avatar" id="profile_avatar">
+                        <input type="file" id="upload_profile_avatar" accept=".png, .jpg, .jpeg, .gif" onchange="previewProfileAvatar(event)">
+                        <a href="javascript:" class="zwicon-camera profile__img__edit" onclick="$('#upload_profile_avatar').click()"></a>
+                    </div>
+
+                    <div class="profile__info">
+                        <ul class="icon-list">
+                            <li><i class="zwicon-user-circle"></i> <%= user.username %></li>
+                            <li><i class="zwicon-mail"></i> <%= user.email %></li>
+                            <li><i class="zwicon-phone"></i> <%= user.phone %></li>
+                            <!--<li>-->
+                            <!--<select class="select2 form-control" id="language_group" data-minimum-results-for-search="-1">-->
+                            <!--<option value="en" <%= (i18n.locale == 'EN') ? 'selected' : '' %> data-flag="us"> English</option>-->
+                            <!--<option value="pl" <%= (i18n.locale == 'PL') ? 'selected' : '' %> data-flag="pl"> Polski</option>-->
+                            <!--</select>-->
+                            <!--</li>-->
+                            <li>
+                                <button class="btn btn-theme-dark" onclick="saveAvatar()"><%= i18n.__('SAVE') %></button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <form class="" id="profile_form">
+                            <div class="form-group">
+                                <label><%= i18n.__('User Name') %></label>
+                                <input type="text" class="form-control" id="profile_user_name" value="<%= user.username %>">
+                            </div>
+                            <div class="form-group">
+                                <label><%= i18n.__('Email Address') %></label>
+                                <input type="email" class="form-control" id="profile_email" value="<%= user.email %>" disabled>
+                            </div>
+                            <div class="form-group" id="phone_group">
+                                <label><%= i18n.__('Phone') %></label>
+                                <div class="form-row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="profile_phone" value="<%= user.phone %>" disabled>
+                                    </div>
+                                    <div class="col-sm-2" style="display: none">
+                                        <input type="text" class="form-control" id="old_phone_code" placeholder="<%= 'SMS' %>">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="button" class="btn btn-theme" id="send_old_phone_code_btn"
+                                                onclick="sendOldPhone()"><%= i18n.__('Change') %></button>
+                                        <button type="button" class="btn btn-theme" id="confirm_old_phone_btn" onclick="confirmOldPhone()"
+                                                style="display: none"><%= i18n.__('Verify') %></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" id="new_phone_group" style="display: none;">
+                                <label><%= i18n.__('Phone') %></label>
+                                <div class="form-row">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="new_profile_phone">
+                                    </div>
+                                    <div class="col-sm-2" style="display: none">
+                                        <input type="text" class="form-control" id="new_phone_code" placeholder="<%= 'SMS' %>">
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <button type="button" class="btn btn-theme" id="send_new_phone_code_btn"
+                                                onclick="sendNewPhone()"><%= i18n.__('Change') %></button>
+                                        <button type="button" class="btn btn-theme" id="confirm_new_phone_btn" onclick="confirmNewPhone()"
+                                                style="display: none"><%= i18n.__('Verify') %></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label><%= i18n.__('Old Password') %></label>
+                                <input type="password" id="profile_old_password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label><%= i18n.__('New Password') %></label>
+                                <input type="password" class="form-control" id="profile_new_password">
+                            </div>
+                            <div class="form-group">
+                                <label><%= i18n.__('Confirm New Password') %></label>
+                                <input type="password" class="form-control" id="profile_confirm_password">
+                            </div>
+                            <div class="form-group" style="text-align: center">
+                                <button class="btn btn-outline-danger"><%= i18n.__('Edit Profile') %></button>
+                                <button class="btn btn-outline-secondary" type="button" onclick="location.reload()"><%= i18n.__('Cancel') %></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2"></div>
+        </div>
+    </div>
+</section>
+
+<% include ../partials/footer.ejs %>
+<% include ../partials/foot.ejs %>
+<script src="/main/tel-input/js/intlTelInput.js"></script>
+<script src="/main/js/jquery.qrcode.min.js"></script>
+<script>
+    let messages = [
+        '<%= i18n.__("First name is empty") %>',  // 0
+        '<%= i18n.__("Last name is empty") %>',  // 1
+        '<%= i18n.__("Old password is empty") %>',  // 2
+        '<%= i18n.__("New password is empty") %>',  // 3
+        '<%= i18n.__("Confirm password is empty") %>',  // 4
+        '<%= i18n.__("Confirm password does not match with password") %>',  // 5
+        '<%= i18n.__("2FA code is needed") %>',  // 6
+        '<%= i18n.__("Activated Your 2FA") %>',  // 7
+        '<%= i18n.__("Failed Activate 2FA") %>',  // 8
+        '<%= i18n.__("Avatar is not changed") %>',  // 9
+        '<%= i18n.__("Phone number format is not valid") %>',  // 10
+        '<%= i18n.__("Phone code is empty") %>',  // 11
+        '<%= i18n.__("Bank number is not valid") %>',  // 12
+        '<%= i18n.__("Confirm email is not valid") %>',  // 13
+        '<%= i18n.__("Wallet address is not valid") %>',  // 14
+    ];
+    let user = JSON.parse(`<%- JSON.stringify(user) %>`);
+    $(document).ready(function () {
+        let telInput = document.querySelector('#profile_phone');
+        let telInput1 = document.querySelector('#new_profile_phone');
+        window.intlTelInput(telInput, {
+            separateDialCode: true,
+            initialCountry: user.iso2
+        });
+        window.intlTelInput(telInput1, {
+            separateDialCode: true,
+            initialCountry: user.iso2
+        });
+        $('#history_business_agreement').dataTable({
+            aaSorting: [],
+            autoWidth: !1,
+            responsive: !0,
+            lengthMenu: [[15, 40, 100, -1], ["15 Rows", "40 Rows", "100 Rows", "Everything"]],
+            language: {searchPlaceholder: "Search for records..."},
+            sDom: '<"dataTables__top"flB<"dataTables_actions">>rt<"dataTables__bottom"ip><"clear">',
+        });
+        setTimeout(function () {
+            let qr_text = $('#factor2_qr_token').val();
+            if (qr_text) {
+                let qr_code = new QRCode("factor2_qr_code", {
+                    width: 200,
+                    height: 200,
+                });
+                qr_code.makeCode(qr_text);
+            }
+        }, 600)
+    });
+    $(function () {
+        let format = function (state) {
+            if (!state.id) return state.text; // optgroup
+            return "<i class='flag-icon flag-icon-" + $(state.element).attr('data-flag') + "'></i> " + state.text;
+        }
+        $(".select2").select2({
+            templateResult: format,
+            templateSelection: format,
+            escapeMarkup: function (m) {
+                return m;
+            }
+        });
+    });
+</script>
+<script src="/main/js/account_settings.js"></script>
+</body>
+</html>
