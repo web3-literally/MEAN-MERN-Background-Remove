@@ -34,7 +34,7 @@
     "node-bitcoin-rpc": "^1.1.3",
     "node-cron": "^2.0.3",
     "nodemailer": "^6.4.2",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
     "smsapi": "^1.7.1",
