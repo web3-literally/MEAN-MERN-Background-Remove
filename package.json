@@ -39,7 +39,7 @@
     "request-promise": "^4.2.5",
     "smsapi": "^1.7.1",
     "speakeasy": "^2.0.0",
-    "underscore": "^1.9.1",
+    "underscore": "^1.12.1",
     "wallet-address-validator": "^0.2.4",
     "websocket": "^1.0.31"
   },
